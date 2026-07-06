@@ -186,7 +186,15 @@
                 <span class="chat-header-subtitle">Enrollment Assistant</span>
             </div>
         </div>
-        <button id="close-btn">&times;</button>
+        <div class="chat-header-actions">
+            <div class="chat-help">
+                <button id="help-btn" type="button" aria-label="Show Navibot disclaimer">?</button>
+                <div class="chat-help-tooltip" role="tooltip">
+                    Please note: Navibot is designed to help with enrollment FAQs, the information provided may not always be fully accurate or up-to-date. For important details, please verify with official school resources.
+                </div>
+            </div>
+            <button id="close-btn">&times;</button>
+        </div>
     </div>
 
     <div id="chat-box">
@@ -209,10 +217,6 @@
     <div id="input-container">
         <input type="text" id="user-input" placeholder="Type your message...">
         <button id="send-btn">Send</button>
-    </div>
-
-    <div id="disclaimer">
-        Please note: Navibot is designed to help with enrollment FAQs, the information provided may not always be fully accurate or up-to-date. For important details, please verify with official school resources.
     </div>
 </div>
 

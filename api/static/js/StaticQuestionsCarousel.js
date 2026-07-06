@@ -63,24 +63,14 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
                             key: 'copy',
                             className: 'suggested-prompts-copy'
                         },
-                        [
-                            React.createElement(
-                                'div',
-                                {
-                                    key: 'label',
-                                    className: 'suggested-prompts-label'
-                                },
-                                'Suggested Prompts'
-                            ),
-                            React.createElement(
-                                'div',
-                                {
-                                    key: 'hint',
-                                    className: 'suggested-prompts-hint'
-                                },
-                                'Try one of these common questions.'
-                            )
-                        ]
+                        React.createElement(
+                            'div',
+                            {
+                                key: 'label',
+                                className: 'suggested-prompts-label'
+                            },
+                            'Suggested Prompts'
+                        )
                     ),
                     React.createElement(
                         'div',
@@ -126,24 +116,14 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
                                         onClick: () => onQuestionSelect(question),
                                         className: 'suggested-prompt-card'
                                     },
-                                    [
-                                        React.createElement(
-                                            'span',
-                                            {
-                                                key: 'badge',
-                                                className: 'suggested-prompt-badge'
-                                            },
-                                            'Ask'
-                                        ),
-                                        React.createElement(
-                                            'span',
-                                            {
-                                                key: 'text',
-                                                className: 'suggested-prompt-text'
-                                            },
-                                            question
-                                        )
-                                    ]
+                                    React.createElement(
+                                        'span',
+                                        {
+                                            key: 'text',
+                                            className: 'suggested-prompt-text'
+                                        },
+                                        question
+                                    )
                                 )
                             )
                             : React.createElement(

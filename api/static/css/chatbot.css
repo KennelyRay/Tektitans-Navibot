@@ -136,6 +136,12 @@
     flex-direction: column;
 }
 
+.chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .chat-header-title {
     font-size: 18px;
     font-weight: 700;
@@ -149,11 +155,16 @@
     letter-spacing: 0.02em;
 }
 
+.chat-help {
+    position: relative;
+}
+
+#help-btn,
+
 #close-btn {
     width: 36px;
     height: 36px;
     border: 0;
-    border-radius: 12px;
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     font-size: 22px;
@@ -162,9 +173,49 @@
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
+#help-btn {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#help-btn:hover,
+#help-btn:focus,
 #close-btn:hover {
     background: rgba(255, 255, 255, 0.18);
     transform: scale(1.04);
+}
+
+#help-btn:focus,
+#close-btn:focus {
+    outline: none;
+}
+
+.chat-help-tooltip {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 260px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.98);
+    color: var(--navibot-text-soft);
+    font-size: 11px;
+    line-height: 1.55;
+    border: 1px solid rgba(11, 45, 99, 0.08);
+    box-shadow: 0 18px 30px rgba(11, 45, 99, 0.16);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.chat-help:hover .chat-help-tooltip,
+.chat-help:focus-within .chat-help-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 #chat-box {
@@ -341,8 +392,8 @@
 
 #static-questions {
     flex-shrink: 0;
-    min-height: 112px;
-    padding: 14px 14px 10px;
+    min-height: 84px;
+    padding: 10px 12px 8px;
     background: rgba(244, 248, 255, 0.96);
     border-top: 1px solid rgba(11, 45, 99, 0.08);
     border-bottom: 1px solid rgba(11, 45, 99, 0.08);
@@ -351,45 +402,33 @@
 .suggested-prompts-shell {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 14px;
-    border-radius: 20px;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 16px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 246, 255, 0.96) 100%);
     border: 1px solid rgba(11, 45, 99, 0.08);
-    box-shadow: 0 14px 28px rgba(11, 45, 99, 0.08);
+    box-shadow: 0 10px 20px rgba(11, 45, 99, 0.06);
 }
 
 .suggested-prompts-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    gap: 12px;
-}
-
-.suggested-prompts-copy {
-    min-width: 0;
+    gap: 8px;
 }
 
 .suggested-prompts-label {
     color: var(--navibot-primary);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-}
-
-.suggested-prompts-hint {
-    margin-top: 4px;
-    color: var(--navibot-text-soft);
-    font-size: 12px;
-    line-height: 1.45;
 }
 
 .suggested-prompts-pager {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding-top: 4px;
+    gap: 5px;
     flex-shrink: 0;
 }
 
@@ -402,30 +441,30 @@
 }
 
 .suggested-prompts-dot.active {
-    width: 18px;
+    width: 14px;
     background: linear-gradient(135deg, #0f4ba6 0%, #0a2f67 100%);
 }
 
 .suggested-prompts-body {
     display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
 }
 
 .suggested-prompts-list {
     display: grid;
-    gap: 10px;
+    gap: 8px;
 }
 
 .suggested-prompts-nav {
     border: 1px solid rgba(11, 45, 99, 0.1);
-    border-radius: 14px;
+    border-radius: 12px;
     background: #ffffff;
     color: var(--navibot-primary);
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
-    box-shadow: 0 10px 18px rgba(11, 45, 99, 0.08);
+    box-shadow: 0 8px 14px rgba(11, 45, 99, 0.06);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
@@ -443,17 +482,14 @@
 
 .suggested-prompt-card {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 14px 15px;
+    display: block;
+    padding: 10px 12px;
     border: 1px solid rgba(11, 45, 99, 0.08);
-    border-radius: 18px;
+    border-radius: 14px;
     background: #ffffff;
     color: var(--navibot-text);
     text-align: left;
-    box-shadow: 0 10px 18px rgba(11, 45, 99, 0.06);
+    box-shadow: 0 8px 14px rgba(11, 45, 99, 0.05);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
@@ -463,28 +499,15 @@
     transform: translateY(-1px);
     border-color: rgba(15, 75, 166, 0.22);
     background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
-    box-shadow: 0 16px 26px rgba(11, 45, 99, 0.1);
+    box-shadow: 0 12px 22px rgba(11, 45, 99, 0.08);
     outline: none;
 }
 
-.suggested-prompt-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: rgba(15, 75, 166, 0.1);
-    color: #0f4ba6;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
 .suggested-prompt-text {
-    font-size: 13px;
+    display: block;
+    font-size: 12px;
     font-weight: 600;
-    line-height: 1.45;
+    line-height: 1.35;
     color: #173056;
 }
 
@@ -549,14 +572,6 @@
     box-shadow: 0 16px 26px rgba(11, 45, 99, 0.24);
 }
 
-#disclaimer {
-    padding: 0 16px 16px;
-    background: rgba(255, 255, 255, 0.92);
-    color: #74839d;
-    font-size: 11px;
-    line-height: 1.45;
-}
-
 @media (max-width: 768px) {
     #chat-bubble {
         right: 16px;
@@ -584,17 +599,17 @@
     }
 
     #static-questions {
-        min-height: 104px;
-        padding: 12px;
+        min-height: 76px;
+        padding: 10px;
     }
 
     .suggested-prompts-shell {
-        padding: 12px;
-        border-radius: 18px;
+        padding: 9px;
+        border-radius: 15px;
     }
 
     .suggested-prompts-body {
-        grid-template-columns: 36px minmax(0, 1fr) 36px;
+        grid-template-columns: 30px minmax(0, 1fr) 30px;
         gap: 8px;
     }
 }
@@ -631,10 +646,15 @@
     }
 
     .suggested-prompts-nav {
-        min-height: 40px;
+        min-height: 34px;
     }
 
     .suggested-prompts-list {
         order: -1;
+    }
+
+    .chat-help-tooltip {
+        width: min(240px, calc(100vw - 48px));
+        right: -36px;
     }
 }

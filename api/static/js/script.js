@@ -42,44 +42,6 @@ $(document).ready(function() {
         $('#chat-box').append(messageHtml);
     }
 
-    function updateBotMeta(meta) {
-        const botMessage = $('#chat-box .message.bot').last();
-        if (!botMessage.length) return;
-
-        let metaText = '';
-        if (meta.source === 'gemini') {
-            metaText = `Source: Gemini`;
-            if (meta.completion_tokens != null || meta.total_tokens != null) {
-                const tokenParts = [];
-                if (meta.prompt_tokens != null) tokenParts.push(`prompt ${meta.prompt_tokens}`);
-                if (meta.completion_tokens != null) tokenParts.push(`completion ${meta.completion_tokens}`);
-                if (meta.total_tokens != null) tokenParts.push(`total ${meta.total_tokens}`);
-                metaText += ` (${tokenParts.join(', ')})`;
-            }
-        } else if (meta.source === 'static_qa') {
-            metaText = 'Source: Static FAQ';
-        } else if (meta.source === 'relevancy_guard') {
-            metaText = 'Source: Enrollment filter';
-        } else if (meta.source === 'fallback') {
-            metaText = 'Source: Fallback response';
-            if (meta.reason) {
-                metaText += ` (${meta.reason})`;
-            }
-            if (meta.error) {
-                metaText += ` - ${meta.error}`;
-            }
-        }
-
-        if (!metaText) return;
-
-        let metaNode = botMessage.find('.message-meta');
-        if (!metaNode.length) {
-            botMessage.append('<div class="message-meta"></div>');
-            metaNode = botMessage.find('.message-meta');
-        }
-        metaNode.text(metaText);
-    }
-
     // Process user input (either from text input or carousel)
     function processUserInput(input) {
         // Add bot response container with typing indicator
@@ -88,7 +50,6 @@ $(document).ready(function() {
                 <div class="avatar"></div>
                 <div class="message bot">
                     <div class="message-content"></div>
-                    <div class="message-meta"></div>
                     <div class="typing-indicator-container">
                         <span class="typing-indicator"></span>
                         <span class="typing-indicator"></span>
@@ -105,14 +66,6 @@ $(document).ready(function() {
         eventSource = new EventSource('/chat-stream?message=' + encodeURIComponent(input));
 
         let accumulatedData = '';
-
-        eventSource.addEventListener('meta', function(event) {
-            try {
-                updateBotMeta(JSON.parse(event.data));
-            } catch (error) {
-                console.error('Failed to parse chat metadata:', error);
-            }
-        });
 
         eventSource.onmessage = function(event) {
             if (event.data === '[END]') {
