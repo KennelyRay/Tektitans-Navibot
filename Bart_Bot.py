@@ -31,10 +31,8 @@ FINE_TUNED_BART_DIR = BASE_DIR / "output" / "fine-tuned-bart"
 IS_VERCEL = bool(os.environ.get("VERCEL")) or bool(os.environ.get("VERCEL_ENV"))
 ENABLE_SEMANTIC_MODELS = os.environ.get("ENABLE_SEMANTIC_MODELS", "").lower() in {"1", "true", "yes"} and not IS_VERCEL
 ENABLE_GENERATIVE_MODEL = os.environ.get("ENABLE_GENERATIVE_MODEL", "").lower() in {"1", "true", "yes"} and not IS_VERCEL
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
-OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini").strip() or "openai/gpt-4o-mini"
-OPENROUTER_SITE_URL = os.environ.get("OPENROUTER_SITE_URL", "").strip()
-OPENROUTER_APP_NAME = os.environ.get("OPENROUTER_APP_NAME", "Tektitans-Navibot").strip() or "Tektitans-Navibot"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip() or "gemini-2.0-flash"
 BART_WEIGHT_FILES = ("pytorch_model.bin", "model.safetensors", "tf_model.h5")
 QUESTION_WORDS = {"how", "who", "what", "where", "when", "why", "which"}
 STOP_WORDS = {
@@ -51,8 +49,8 @@ def get_env_int(name, default):
         return default
 
 
-OPENROUTER_MAX_CONTEXT_ITEMS = get_env_int("OPENROUTER_MAX_CONTEXT_ITEMS", 3)
-OPENROUTER_MAX_TOKENS = get_env_int("OPENROUTER_MAX_TOKENS", 300)
+GEMINI_MAX_CONTEXT_ITEMS = get_env_int("GEMINI_MAX_CONTEXT_ITEMS", 3)
+GEMINI_MAX_TOKENS = get_env_int("GEMINI_MAX_TOKENS", 300)
 
 app = Flask(
     __name__,
@@ -209,18 +207,16 @@ def get_llm_client():
         return llm_client
 
     llm_client_checked = True
-    if not OPENROUTER_API_KEY:
+    if not GEMINI_API_KEY:
         return None
 
     try:
-        from openai import OpenAI
+        import google.generativeai as genai
 
-        llm_client = OpenAI(
-            api_key=OPENROUTER_API_KEY,
-            base_url="https://openrouter.ai/api/v1",
-        )
+        genai.configure(api_key=GEMINI_API_KEY)
+        llm_client = genai
     except Exception as exc:
-        print(f"Unable to initialize OpenRouter client: {exc}")
+        print(f"Unable to initialize Gemini client: {exc}")
         llm_client = None
 
     return llm_client
@@ -489,7 +485,7 @@ def build_meta_event(**payload):
 def deployed_fallback_message():
     return (
         "I can answer common enrollment questions, but the AI response service is not configured yet. "
-        "Add OPENROUTER_API_KEY in Vercel environment variables to enable generated answers."
+        "Add GEMINI_API_KEY in Vercel environment variables to enable generated answers."
     )
 
 
@@ -505,7 +501,7 @@ def temporary_service_message(query):
 
 
 def build_context_block(query):
-    matches = get_top_static_matches(query, limit=OPENROUTER_MAX_CONTEXT_ITEMS)
+    matches = get_top_static_matches(query, limit=GEMINI_MAX_CONTEXT_ITEMS)
     relevant_matches = [match for match in matches if match[0] >= 0.2]
 
     if not relevant_matches:
@@ -519,14 +515,29 @@ def build_context_block(query):
     return "\n\n".join(context_lines)
 
 
-def stream_openrouter_response(prompt):
-    client = get_llm_client()
-    if not client:
+def extract_gemini_chunk_text(chunk):
+    text = getattr(chunk, "text", None)
+    if text:
+        return text
+
+    candidates = getattr(chunk, "candidates", None) or []
+    for candidate in candidates:
+        content = getattr(candidate, "content", None)
+        parts = getattr(content, "parts", None) or []
+        text_parts = [getattr(part, "text", "") for part in parts if getattr(part, "text", "")]
+        if text_parts:
+            return "".join(text_parts)
+    return ""
+
+
+def stream_gemini_response(prompt):
+    genai = get_llm_client()
+    if not genai:
         yield build_meta_event(
             source="fallback",
-            reason="missing_openrouter_key",
-            openrouter_key_present=bool(OPENROUTER_API_KEY),
-            openrouter_model=OPENROUTER_MODEL,
+            reason="missing_gemini_key",
+            gemini_key_present=bool(GEMINI_API_KEY),
+            gemini_model=GEMINI_MODEL,
         )
         yield format_response(deployed_fallback_message())
         yield "[END]"
@@ -543,52 +554,32 @@ def stream_openrouter_response(prompt):
     faq_context = build_context_block(prompt)
 
     try:
-        extra_headers = {}
-        if OPENROUTER_SITE_URL:
-            extra_headers["HTTP-Referer"] = OPENROUTER_SITE_URL
-        if OPENROUTER_APP_NAME:
-            extra_headers["X-Title"] = OPENROUTER_APP_NAME
-
-        stream = client.chat.completions.create(
-            model=OPENROUTER_MODEL,
-            temperature=0.2,
-            max_tokens=OPENROUTER_MAX_TOKENS,
-            stream=True,
-            stream_options={"include_usage": True},
-            extra_headers=extra_headers or None,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "system", "content": f"Relevant FAQ context:\n{faq_context}"},
-                {"role": "user", "content": prompt},
-            ],
+        model = genai.GenerativeModel(
+            model_name=GEMINI_MODEL,
+            system_instruction=system_prompt,
+            generation_config={
+                "temperature": 0.2,
+                "max_output_tokens": GEMINI_MAX_TOKENS,
+            },
         )
+        full_prompt = (
+            f"Relevant FAQ context:\n{faq_context}\n\n"
+            f"Student question:\n{prompt}"
+        )
+        stream = model.generate_content(full_prompt, stream=True)
 
         accumulated_response = ""
         sent_source_meta = False
         for chunk in stream:
-            usage = getattr(chunk, "usage", None)
-            if usage is not None:
-                yield build_meta_event(
-                    source="openrouter",
-                    model=OPENROUTER_MODEL,
-                    prompt_tokens=getattr(usage, "prompt_tokens", None),
-                    completion_tokens=getattr(usage, "completion_tokens", None),
-                    total_tokens=getattr(usage, "total_tokens", None),
-                    max_tokens=OPENROUTER_MAX_TOKENS,
-                )
-
-            delta = ""
-            choices = getattr(chunk, "choices", None) or []
-            if choices:
-                delta = getattr(choices[0].delta, "content", "") or ""
+            delta = extract_gemini_chunk_text(chunk)
             if not delta:
                 continue
 
             if not sent_source_meta:
                 yield build_meta_event(
-                    source="openrouter",
-                    model=OPENROUTER_MODEL,
-                    max_tokens=OPENROUTER_MAX_TOKENS,
+                    source="gemini",
+                    model=GEMINI_MODEL,
+                    max_tokens=GEMINI_MAX_TOKENS,
                 )
                 sent_source_meta = True
 
@@ -597,8 +588,8 @@ def stream_openrouter_response(prompt):
     except Exception as exc:
         yield build_meta_event(
             source="fallback",
-            reason="openrouter_error",
-            openrouter_model=OPENROUTER_MODEL,
+            reason="gemini_error",
+            gemini_model=GEMINI_MODEL,
             error=str(exc)[:300],
         )
         yield format_response(temporary_service_message(prompt))
@@ -608,7 +599,7 @@ def stream_openrouter_response(prompt):
 def generate_response_stream(prompt):
     llm_enabled = bool(get_llm_client())
     if llm_enabled:
-        for chunk in stream_openrouter_response(prompt):
+        for chunk in stream_gemini_response(prompt):
             yield chunk
         return
 
@@ -653,13 +644,11 @@ def health():
         "status": "ok",
         "semantic_models_enabled": ENABLE_SEMANTIC_MODELS,
         "generative_model_enabled": ENABLE_GENERATIVE_MODEL,
-        "openrouter_enabled": bool(OPENROUTER_API_KEY),
-        "openrouter_key_present": bool(OPENROUTER_API_KEY),
-        "openrouter_model": OPENROUTER_MODEL,
-        "openrouter_max_context_items": OPENROUTER_MAX_CONTEXT_ITEMS,
-        "openrouter_max_tokens": OPENROUTER_MAX_TOKENS,
-        "openrouter_site_url": OPENROUTER_SITE_URL,
-        "openrouter_app_name": OPENROUTER_APP_NAME,
+        "gemini_enabled": bool(GEMINI_API_KEY),
+        "gemini_key_present": bool(GEMINI_API_KEY),
+        "gemini_model": GEMINI_MODEL,
+        "gemini_max_context_items": GEMINI_MAX_CONTEXT_ITEMS,
+        "gemini_max_tokens": GEMINI_MAX_TOKENS,
         "vercel": IS_VERCEL,
     }
 

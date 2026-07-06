@@ -14,30 +14,28 @@ This repo is now configured to deploy as a Python serverless app on Vercel.
 
 ### Important runtime behavior
 
-The Vercel deployment is optimized for Vercel serverless hosting and now supports OpenRouter as the generative fallback.
+The Vercel deployment is optimized for Vercel serverless hosting and now supports Google Gemini as the generative fallback.
 
 - Static Q&A from `Data/static_qa.json` works in Vercel.
 - Topic filtering still works.
-- If a static FAQ match is not found, the app can call OpenRouter for a generated answer.
+- If a static FAQ match is not found, the app can call Gemini for a generated answer.
 - Heavy local NLP and BART generation are still disabled by default in Vercel because the required model files and startup cost are not serverless-friendly.
 
 ### Vercel environment variables
 
 Add these in your Vercel project settings:
 
-- `OPENROUTER_API_KEY` = your OpenRouter API key
-- `OPENROUTER_MODEL` = `openai/gpt-4o-mini` (recommended default)
+- `GEMINI_API_KEY` = your Google AI Studio API key
+- `GEMINI_MODEL` = `gemini-2.0-flash` (recommended default)
 
 Optional:
 
-- `OPENROUTER_MAX_CONTEXT_ITEMS` = `3`
-- `OPENROUTER_MAX_TOKENS` = `300`
-- `OPENROUTER_SITE_URL` = your deployed site URL
-- `OPENROUTER_APP_NAME` = `Tektitans-Navibot`
+- `GEMINI_MAX_CONTEXT_ITEMS` = `3`
+- `GEMINI_MAX_TOKENS` = `300`
 - `ENABLE_GENERATIVE_MODEL` = `true` only if you still want to try a local BART fallback outside Vercel
 - `BART_MODEL_PATH` = path to a local BART model outside Vercel
 
-If you do not add `OPENROUTER_API_KEY`, the deployed chatbot will still answer direct static FAQ matches, but unmatched questions will return a configuration message instead of a generated response.
+If you do not add `GEMINI_API_KEY`, the deployed chatbot will still answer direct static FAQ matches, but unmatched questions will return a configuration message instead of a generated response.
 
 If you want a different generative setup in production, use one of these approaches:
 
@@ -53,7 +51,7 @@ If you want a different generative setup in production, use one of these approac
 2. Import the repo into Vercel.
 3. Leave the project root as the repository root.
 4. Vercel should detect the Python setup automatically using `vercel.json`.
-5. Add the required `OPENROUTER_API_KEY` environment variable in Vercel.
+5. Add the required `GEMINI_API_KEY` environment variable in Vercel.
 6. Deploy.
 
 After deploy, test:
