@@ -185,6 +185,10 @@ FOLLOW_UP_HINTS = (
 )
 FOLLOW_UP_REFERENCES = {"there", "that", "it", "this", "those", "them"}
 TOPIC_PATTERNS = {
+    "enrollment_process": (
+        "how do i enroll", "how can i enroll", "how do i start enrollment",
+        "how can i start enrollment", "start enrollment", "enrollment process",
+    ),
     "enrollment_venue": (
         "enroll", "enrollment", "venue", "student portal", "devesse", "devesee",
         "plaza", "regular student", "irregular student",
@@ -301,6 +305,11 @@ def resolve_follow_up_query(query, history):
         _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from current topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where can I find the prerequisite of a subject?"})
         # #endregion
         return "Where can I find the prerequisite of a subject?"
+    if current_topic == "enrollment_process":
+        # #region debug-point A:followup-current-process
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from current topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "How do I start the enrollment process?"})
+        # #endregion
+        return "How do I start the enrollment process?"
     if current_topic == "available_subjects":
         # #region debug-point A:followup-current-subjects
         _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from current topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where can I find available subjects?"})

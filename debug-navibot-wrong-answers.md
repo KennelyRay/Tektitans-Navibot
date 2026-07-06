@@ -21,5 +21,17 @@
 - Compare the runtime logs to confirm which branch is producing the wrong answer.
 
 ## Status
-- Session opened.
-- Instrumentation pending.
+- Runtime evidence collected locally with instrumented Flask test-client requests.
+- Root cause confirmed for wrong static answers in history-sensitive enrollment questions.
+- Minimal fix applied; awaiting deployed user verification.
+
+## Evidence Summary
+- Pre-fix evidence showed `How do I enroll?` over-matching the wrong FAQ because single-token overlap produced a perfect score and broad venue variants captured generic enrollment prompts.
+- Additional pre-fix evidence showed that with existing venue history, `How do I enroll?` was rewritten by the follow-up resolver into the venue FAQ instead of the enrollment-process FAQ.
+- Post-fix evidence shows `How do I enroll?` now resolves to `How do I start the enrollment process?` even when prior venue history exists.
+
+## Fix Summary
+- Tightened static similarity scoring so overlap does not get a perfect score from single-token matches.
+- Moved the broad `where is the enrollment venue` phrase to the combined venue FAQ target.
+- Added explicit enrollment-process variants to the enrollment-process FAQ target.
+- Added a higher-priority `enrollment_process` topic so `How do I enroll?` is not hijacked by venue follow-up history.
