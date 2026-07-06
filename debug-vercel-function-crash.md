@@ -25,3 +25,6 @@
 - Evidence received from Vercel build logs.
 - Confirmed root cause: Vercel builder could not statically find a top-level `app`, `application`, or `handler` symbol in `api/index.py`.
 - Minimal fix applied: declared `app = Flask(__name__)` at module top level so Vercel can detect the entrypoint, while preserving bootstrap instrumentation.
+- Runtime evidence received from deployed traceback.
+- Confirmed secondary root cause: the deployed Python function bundle did not include `Data/static_qa.json`, causing `FileNotFoundError` during `load_config()`.
+- Minimal fix applied: replaced legacy `builds` config with `functions` config and explicitly included `Data/**`, `templates/**`, and `static/**` in the Python function bundle.
