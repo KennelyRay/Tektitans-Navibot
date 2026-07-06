@@ -74,6 +74,36 @@ def load_config():
 
 STATIC_QA, enrollment_topics, NON_ACADEMIC_CONTEXTS = load_config()
 static_questions = list(STATIC_QA.keys())
+FAQ_VARIANTS = {
+    "Where is the enrollment venue for irregular students?": [
+        "where is the enrollment venue",
+        "where is the venue for irregular students",
+        "where do irregular students enroll",
+        "where can irregular students enroll",
+        "where is irregular enrollment",
+    ],
+    "Where do regular students enroll?": [
+        "where do regular students enroll",
+        "where can regular students enroll",
+        "where is regular enrollment",
+        "where is the venue for regular students",
+        "where should regular students enroll",
+    ],
+    "Where can I find available subjects?": [
+        "where can i check my subjects",
+        "where can i find my subjects",
+        "where do i see available subjects",
+        "where can i see my available subjects",
+        "where are available subjects listed",
+    ],
+    "Where can I find the prerequisite of a subject?": [
+        "where do i see prerequisites",
+        "where can i find prerequisites",
+        "where can i check prerequisite subjects",
+        "what are the prerequisites for a subject",
+        "where is the prerequisite of a subject found",
+    ],
+}
 
 sentence_model = None
 sentence_util = None
@@ -223,12 +253,18 @@ def get_llm_client():
 
 
 def question_similarity_score(query, query_tokens, question):
-    question_lower = question.lower().strip()
-    question_tokens = set(tokenize_text(question_lower)) - STOP_WORDS
-    overlap_score = len(query_tokens & question_tokens) / max(len(question_tokens), 1)
-    sequence_score = SequenceMatcher(None, query.lower().strip(), question_lower).ratio()
-    substring_score = 1.0 if query.lower().strip() in question_lower or question_lower in query.lower().strip() else 0.0
-    return max(overlap_score, sequence_score, substring_score)
+    candidates = [question.lower().strip()]
+    candidates.extend(variant.lower().strip() for variant in FAQ_VARIANTS.get(question, []))
+
+    best_score = 0.0
+    normalized_query = query.lower().strip()
+    for candidate in candidates:
+        candidate_tokens = set(tokenize_text(candidate)) - STOP_WORDS
+        overlap_score = len(query_tokens & candidate_tokens) / max(len(candidate_tokens), 1)
+        sequence_score = SequenceMatcher(None, normalized_query, candidate).ratio()
+        substring_score = 1.0 if normalized_query in candidate or candidate in normalized_query else 0.0
+        best_score = max(best_score, overlap_score, sequence_score, substring_score)
+    return best_score
 
 
 def best_static_question_score(query, query_tokens):
@@ -326,7 +362,9 @@ def find_static_answer(query, similarity_threshold=0.7):
     query_tokens = processed["tokens"]
 
     for question in static_questions:
-        if query_lower == question.lower().strip():
+        exact_candidates = [question.lower().strip()]
+        exact_candidates.extend(variant.lower().strip() for variant in FAQ_VARIANTS.get(question, []))
+        if query_lower in exact_candidates:
             return {
                 "found": True,
                 "answer": STATIC_QA[question],

@@ -13,5 +13,21 @@
 
     "Who do I contact for enrollment-related questions in CS and IT?": "For enrollment assistance:\n\nComputer Science:\nDr. Josephine Dela Cruz\nEmail: <a href='mailto:jdelacruz@slu.edu.ph' target='_blank'>jdelacruz@slu.edu.ph</a>\n\nInformation Technology:\nMs. Kasima Rose Mendoza\nEmail: <a href='mailto:krmmendoza@slu.edu.ph' target='_blank'>krmmendoza@slu.edu.ph</a>",
 
-    "Who are the department heads?": "The department heads are:\n\nComputer Science:\nDr. Josephine Dela Cruz\nEmail: <a href='mailto:jdelacruz@slu.edu.ph' target='_blank'>jdelacruz@slu.edu.ph</a>\n\nInformation Technology:\nMs. Kasima Rose Mendoza\nEmail: <a href='mailto:krmmendoza@slu.edu.ph' target='_blank'>krmmendoza@slu.edu.ph</a>"
+    "Who are the department heads?": "The department heads are:\n\nComputer Science:\nDr. Josephine Dela Cruz\nEmail: <a href='mailto:jdelacruz@slu.edu.ph' target='_blank'>jdelacruz@slu.edu.ph</a>\n\nInformation Technology:\nMs. Kasima Rose Mendoza\nEmail: <a href='mailto:krmmendoza@slu.edu.ph' target='_blank'>krmmendoza@slu.edu.ph</a>",
+
+    "Where is the enrollment venue for irregular students?": "Irregular students should enroll at Devesse Plaza.",
+
+    "Where do irregular students enroll?": "Irregular students enroll at Devesse Plaza.",
+
+    "Where do regular students enroll?": "Regular students enroll through the Student Portal.",
+
+    "What is the enrollment venue for regular and irregular students?": "The enrollment venue depends on the student type:\n\n1. Irregular students enroll at Devesse Plaza.\n2. Regular students enroll through the Student Portal.",
+
+    "Where can I find available subjects?": "Available subjects can be found on the Student Portal under the `Curriculum Checklist` tab.",
+
+    "Where can I see available subjects?": "You can see available subjects on the Student Portal under the `Curriculum Checklist` tab.",
+
+    "Where can I find the prerequisite of a subject?": "The prerequisites of certain subjects can be found on the `Curriculum Checklist`.",
+
+    "What is the prerequisite of a certain subject?": "The prerequisites of certain subjects can be found on the `Curriculum Checklist`."
 }
