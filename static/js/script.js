@@ -1,5 +1,6 @@
 $(document).ready(function() {
     let eventSource = null;
+    const conversationHistory = [];
     const $chatContainer = $('#chat-container');
     const $chatInput = $('#user-input');
     $('#chat-container').removeClass('show');
@@ -13,6 +14,19 @@ $(document).ready(function() {
         $chatContainer.removeClass('show');
     }
 
+    function normalizeMessageText(content) {
+        return $('<div>').html(content).text().replace(/\s+/g, ' ').trim();
+    }
+
+    function addHistoryEntry(role, text) {
+        const normalizedText = normalizeMessageText(text);
+        if (!normalizedText) return;
+        conversationHistory.push({ role, text: normalizedText });
+        if (conversationHistory.length > 6) {
+            conversationHistory.splice(0, conversationHistory.length - 6);
+        }
+    }
+
     // Initialize React component
     const root = ReactDOM.createRoot(document.getElementById('static-questions'));
     root.render(React.createElement(StaticQuestionsCarousel, {
@@ -23,6 +37,7 @@ $(document).ready(function() {
     function handleStaticQuestion(question) {
         openChat();
         appendMessage('user', question);
+        addHistoryEntry('user', question);
         processUserInput(question);
     }
 
@@ -63,15 +78,18 @@ $(document).ready(function() {
         $('#send-btn').text("Cancel");
 
         // Send to backend for processing
-        eventSource = new EventSource('/chat-stream?message=' + encodeURIComponent(input));
+        const historyPayload = encodeURIComponent(JSON.stringify(conversationHistory.slice(0, -1)));
+        eventSource = new EventSource('/chat-stream?message=' + encodeURIComponent(input) + '&history=' + historyPayload);
 
         let accumulatedData = '';
 
         eventSource.onmessage = function(event) {
             if (event.data === '[END]') {
                 eventSource.close();
+                eventSource = null;
                 $('#send-btn').text("Send");
                 $('#chat-box .message.bot').last().find('.typing-indicator-container').remove();
+                addHistoryEntry('bot', accumulatedData);
                 return;
             }
             accumulatedData = event.data.replace(/:\s+/g, ':\n');
@@ -81,6 +99,7 @@ $(document).ready(function() {
 
         eventSource.onerror = function() {
             eventSource.close();
+            eventSource = null;
             $('#send-btn').text("Send");
             $('#chat-box .message.bot').last().find('.typing-indicator-container').remove();
             $('#chat-box .message.bot').last().find('.message-content').append('An error occurred.');
@@ -94,6 +113,7 @@ $(document).ready(function() {
         if (!userInput) return;
 
         appendMessage('user', userInput);
+        addHistoryEntry('user', userInput);
         $('#user-input').val('');
         scrollChatToBottom();
 

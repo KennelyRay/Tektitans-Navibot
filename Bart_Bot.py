@@ -89,6 +89,21 @@ FAQ_VARIANTS = {
         "where is the venue for regular students",
         "where should regular students enroll",
     ],
+    "What is the enrollment venue for regular and irregular students?": [
+        "where do i enroll",
+        "where can i enroll",
+        "where is enrollment",
+        "where is the enrollment venue",
+        "where should i enroll",
+    ],
+    "Can I enroll online or onsite?": [
+        "can i enroll online",
+        "can i enroll onsite",
+        "can i enroll in person",
+        "is enrollment online or onsite",
+        "is enrollment online or in person",
+        "online or onsite enrollment",
+    ],
     "Where can I find available subjects?": [
         "where can i check my subjects",
         "where can i find my subjects",
@@ -103,6 +118,51 @@ FAQ_VARIANTS = {
         "what are the prerequisites for a subject",
         "where is the prerequisite of a subject found",
     ],
+    "What payment methods are available?": [
+        "what payment methods are available",
+        "how can i pay",
+        "what are the payment options",
+        "what payment options do i have",
+        "can i pay via gcash",
+        "can i pay via dragonpay",
+        "can i pay by card",
+        "payment methods",
+    ],
+}
+FOLLOW_UP_HINTS = (
+    "how about",
+    "what about",
+    "what if",
+    "and if",
+    "if i'm",
+    "if im",
+    "if i am",
+    "for regular",
+    "for irregular",
+    "online",
+    "onsite",
+    "in person",
+)
+FOLLOW_UP_REFERENCES = {"there", "that", "it", "this", "those", "them"}
+TOPIC_PATTERNS = {
+    "enrollment_venue": (
+        "enroll", "enrollment", "venue", "student portal", "devesse", "devesee",
+        "plaza", "regular student", "irregular student",
+    ),
+    "available_subjects": (
+        "available subjects", "available subject", "subjects", "curriculum checklist",
+        "checklist", "my subjects",
+    ),
+    "prerequisite": (
+        "prerequisite", "prerequisites", "prereq", "pre requisite", "pre-requisite",
+    ),
+    "payment": (
+        "payment", "pay", "tuition", "dragonpay", "upay", "bdo", "cash", "check",
+        "card", "debit", "credit", "bukas", "gcash",
+    ),
+    "enrollment_mode": (
+        "online", "onsite", "in person", "in-person", "face to face", "portal",
+    ),
 }
 
 sentence_model = None
@@ -129,6 +189,109 @@ def preprocess_query(query):
         "processed_text": " ".join(filtered_words),
         "tokens": set(filtered_words),
     }
+
+
+def parse_history_param(raw_history):
+    if not raw_history:
+        return []
+
+    try:
+        parsed = json.loads(raw_history)
+    except json.JSONDecodeError:
+        return []
+
+    if not isinstance(parsed, list):
+        return []
+
+    history = []
+    for item in parsed[-6:]:
+        if not isinstance(item, dict):
+            continue
+        role = str(item.get("role", "")).strip().lower()
+        text = str(item.get("text", "")).strip()
+        if role in {"user", "bot"} and text:
+            history.append({"role": role, "text": text})
+    return history
+
+
+def infer_topic(text):
+    lowered_text = text.lower()
+    for topic, patterns in TOPIC_PATTERNS.items():
+        if any(pattern in lowered_text for pattern in patterns):
+            return topic
+    return None
+
+
+def is_follow_up_query(query):
+    lowered_query = query.lower().strip()
+    query_tokens = set(tokenize_text(lowered_query))
+    return (
+        any(hint in lowered_query for hint in FOLLOW_UP_HINTS)
+        or bool(query_tokens & FOLLOW_UP_REFERENCES)
+        or len(query_tokens) <= 6
+    )
+
+
+def resolve_follow_up_query(query, history):
+    if not history:
+        return query
+
+    lowered_query = query.lower().strip()
+    current_topic = infer_topic(query)
+    previous_topic = None
+    for entry in reversed(history):
+        previous_topic = infer_topic(entry["text"])
+        if previous_topic:
+            break
+
+    if current_topic == "prerequisite":
+        return "Where can I find the prerequisite of a subject?"
+    if current_topic == "available_subjects":
+        return "Where can I find available subjects?"
+    if current_topic == "payment":
+        return "What payment methods are available?"
+    if current_topic == "enrollment_mode":
+        if "regular" in lowered_query:
+            return "Where do regular students enroll?"
+        if "irregular" in lowered_query:
+            return "Where do irregular students enroll?"
+        return "Can I enroll online or onsite?"
+    if current_topic == "enrollment_venue" and "regular" in lowered_query:
+        return "Where do regular students enroll?"
+    if current_topic == "enrollment_venue" and "irregular" in lowered_query:
+        return "Where do irregular students enroll?"
+
+    if not previous_topic or not is_follow_up_query(query):
+        return query
+
+    if previous_topic == "enrollment_venue":
+        if "regular" in lowered_query:
+            return "Where do regular students enroll?"
+        if "irregular" in lowered_query:
+            return "Where do irregular students enroll?"
+        if any(keyword in lowered_query for keyword in ("online", "onsite", "in person", "portal")):
+            return "Can I enroll online or onsite?"
+        return "What is the enrollment venue for regular and irregular students?"
+
+    if previous_topic == "available_subjects":
+        if any(keyword in lowered_query for keyword in ("prerequisite", "prerequisites", "prereq")):
+            return "Where can I find the prerequisite of a subject?"
+        return "Where can I find available subjects?"
+
+    if previous_topic == "prerequisite":
+        return "Where can I find the prerequisite of a subject?"
+
+    if previous_topic == "payment":
+        return "What payment methods are available?"
+
+    if previous_topic == "enrollment_mode":
+        if "regular" in lowered_query:
+            return "Where do regular students enroll?"
+        if "irregular" in lowered_query:
+            return "Where do irregular students enroll?"
+        return "Can I enroll online or onsite?"
+
+    return query
 
 
 def resolve_existing_path(*candidates):
@@ -699,6 +862,7 @@ def serve_qa_json():
 @app.route("/chat-stream")
 def chat_stream():
     user_input = request.args.get("message", "").strip()
+    history = parse_history_param(request.args.get("history", ""))
     if not user_input:
         return Response("No message provided.", status=400)
 
@@ -710,7 +874,8 @@ def chat_stream():
                 yield "data: [END]\n\n"
                 return
 
-            result = process_query(user_input)
+            resolved_input = resolve_follow_up_query(user_input, history)
+            result = process_query(resolved_input)
             if user_input.lower() == "thank you":
                 thanks = format_response("No worries! Happy to help!")
                 yield f"data: {thanks}\n\n"
@@ -731,7 +896,7 @@ def chat_stream():
                 yield "data: [END]\n\n"
                 return
 
-            for response in generate_response_stream(user_input):
+            for response in generate_response_stream(resolved_input):
                 if response == "[END]":
                     yield "data: [END]\n\n"
                 elif response.startswith("event: meta\n"):
