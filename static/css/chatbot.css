@@ -348,6 +348,159 @@
     border-bottom: 1px solid rgba(11, 45, 99, 0.08);
 }
 
+.suggested-prompts-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 246, 255, 0.96) 100%);
+    border: 1px solid rgba(11, 45, 99, 0.08);
+    box-shadow: 0 14px 28px rgba(11, 45, 99, 0.08);
+}
+
+.suggested-prompts-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.suggested-prompts-copy {
+    min-width: 0;
+}
+
+.suggested-prompts-label {
+    color: var(--navibot-primary);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.suggested-prompts-hint {
+    margin-top: 4px;
+    color: var(--navibot-text-soft);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.suggested-prompts-pager {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 4px;
+    flex-shrink: 0;
+}
+
+.suggested-prompts-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(11, 45, 99, 0.16);
+    transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.suggested-prompts-dot.active {
+    width: 18px;
+    background: linear-gradient(135deg, #0f4ba6 0%, #0a2f67 100%);
+}
+
+.suggested-prompts-body {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.suggested-prompts-list {
+    display: grid;
+    gap: 10px;
+}
+
+.suggested-prompts-nav {
+    border: 1px solid rgba(11, 45, 99, 0.1);
+    border-radius: 14px;
+    background: #ffffff;
+    color: var(--navibot-primary);
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: 0 10px 18px rgba(11, 45, 99, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.suggested-prompts-nav:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(11, 45, 99, 0.12);
+}
+
+.suggested-prompts-nav:disabled {
+    cursor: default;
+    opacity: 0.45;
+    box-shadow: none;
+}
+
+.suggested-prompt-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 15px;
+    border: 1px solid rgba(11, 45, 99, 0.08);
+    border-radius: 18px;
+    background: #ffffff;
+    color: var(--navibot-text);
+    text-align: left;
+    box-shadow: 0 10px 18px rgba(11, 45, 99, 0.06);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.suggested-prompt-card:hover,
+.suggested-prompt-card:focus {
+    transform: translateY(-1px);
+    border-color: rgba(15, 75, 166, 0.22);
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    box-shadow: 0 16px 26px rgba(11, 45, 99, 0.1);
+    outline: none;
+}
+
+.suggested-prompt-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(15, 75, 166, 0.1);
+    color: #0f4ba6;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.suggested-prompt-text {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: #173056;
+}
+
+.suggested-prompts-empty {
+    display: grid;
+    place-items: center;
+    min-height: 88px;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px dashed rgba(11, 45, 99, 0.12);
+    background: rgba(11, 45, 99, 0.03);
+    color: var(--navibot-text-soft);
+    font-size: 12px;
+    text-align: center;
+}
+
 #input-container {
     flex-shrink: 0;
     display: flex;
@@ -434,6 +587,16 @@
         min-height: 104px;
         padding: 12px;
     }
+
+    .suggested-prompts-shell {
+        padding: 12px;
+        border-radius: 18px;
+    }
+
+    .suggested-prompts-body {
+        grid-template-columns: 36px minmax(0, 1fr) 36px;
+        gap: 8px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -461,5 +624,17 @@
         width: 32px;
         height: 32px;
         flex-basis: 32px;
+    }
+
+    .suggested-prompts-body {
+        grid-template-columns: 1fr;
+    }
+
+    .suggested-prompts-nav {
+        min-height: 40px;
+    }
+
+    .suggested-prompts-list {
+        order: -1;
     }
 }

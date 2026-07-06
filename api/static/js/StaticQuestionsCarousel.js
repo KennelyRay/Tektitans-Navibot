@@ -37,114 +37,135 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
         (activeIndex + 1) * itemsPerPage
     );
 
-    const navigationButtonStyle = {
-        width: '36px',
-        height: '36px',
-        borderRadius: '12px',
-        border: '1px solid rgba(11, 45, 99, 0.1)',
-        backgroundColor: '#ffffff',
-        color: '#0b2d63',
-        fontSize: '16px',
-        cursor: 'pointer',
-        boxShadow: '0 10px 20px rgba(11, 45, 99, 0.08)',
-        flexShrink: 0,
-    };
-
-    const questionButtonStyle = {
-        width: '100%',
-        padding: '10px 12px',
-        borderRadius: '16px',
-        border: '1px solid rgba(11, 45, 99, 0.08)',
-        backgroundColor: '#ffffff',
-        color: '#173056',
-        textAlign: 'left',
-        fontSize: '12px',
-        fontWeight: '600',
-        lineHeight: '1.45',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-        boxShadow: '0 10px 18px rgba(11, 45, 99, 0.05)',
-    };
+    const promptIndicatorDots = Array.from({ length: totalPages }, (_, index) =>
+        React.createElement('span', {
+            key: `prompt-dot-${index}`,
+            className: `suggested-prompts-dot${index === activeIndex ? ' active' : ''}`
+        })
+    );
 
     return React.createElement(
         'div',
         {
-            style: {
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px'
-            }
+            className: 'suggested-prompts-shell'
         },
         [
             React.createElement(
-                'button',
+                'div',
                 {
-                    onClick: handlePrev,
-                    key: 'prev',
-                    style: navigationButtonStyle,
-                    'aria-label': 'Previous suggested questions',
-                    disabled: staticQuestions.length === 0
+                    key: 'header',
+                    className: 'suggested-prompts-header'
                 },
-                '←'
+                [
+                    React.createElement(
+                        'div',
+                        {
+                            key: 'copy',
+                            className: 'suggested-prompts-copy'
+                        },
+                        [
+                            React.createElement(
+                                'div',
+                                {
+                                    key: 'label',
+                                    className: 'suggested-prompts-label'
+                                },
+                                'Suggested Prompts'
+                            ),
+                            React.createElement(
+                                'div',
+                                {
+                                    key: 'hint',
+                                    className: 'suggested-prompts-hint'
+                                },
+                                'Try one of these common questions.'
+                            )
+                        ]
+                    ),
+                    React.createElement(
+                        'div',
+                        {
+                            key: 'pager',
+                            className: 'suggested-prompts-pager',
+                            'aria-label': 'Suggested prompt pages'
+                        },
+                        promptIndicatorDots
+                    )
+                ]
             ),
             React.createElement(
                 'div',
                 {
-                    key: 'questions',
-                    style: {
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px',
-                        width: '100%'
-                    }
+                    key: 'body',
+                    className: 'suggested-prompts-body'
                 },
-                visibleQuestions.length
-                    ? visibleQuestions.map((question, index) =>
-                        React.createElement(
-                            'button',
-                            {
-                                key: `${question}-${index}`,
-                                onClick: () => onQuestionSelect(question),
-                                style: questionButtonStyle,
-                                onMouseEnter: (e) => {
-                                    e.currentTarget.style.transform = 'translateY(-1px)';
-                                    e.currentTarget.style.boxShadow = '0 14px 22px rgba(11, 45, 99, 0.1)';
-                                    e.currentTarget.style.borderColor = 'rgba(11, 45, 99, 0.18)';
-                                },
-                                onMouseLeave: (e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 10px 18px rgba(11, 45, 99, 0.05)';
-                                    e.currentTarget.style.borderColor = 'rgba(11, 45, 99, 0.08)';
-                                }
-                            },
-                            question
-                        )
-                    )
-                    : React.createElement(
+                [
+                    React.createElement(
+                        'button',
+                        {
+                            onClick: handlePrev,
+                            key: 'prev',
+                            className: 'suggested-prompts-nav',
+                            'aria-label': 'Previous suggested questions',
+                            disabled: staticQuestions.length === 0
+                        },
+                        '\u2190'
+                    ),
+                    React.createElement(
                         'div',
                         {
-                            style: {
-                                padding: '12px 14px',
-                                borderRadius: '16px',
-                                backgroundColor: 'rgba(11, 45, 99, 0.04)',
-                                color: '#62718b',
-                                fontSize: '12px',
-                                textAlign: 'center'
-                            }
+                            key: 'questions',
+                            className: 'suggested-prompts-list'
                         },
-                        'Suggested questions will appear here.'
+                        visibleQuestions.length
+                            ? visibleQuestions.map((question, index) =>
+                                React.createElement(
+                                    'button',
+                                    {
+                                        key: `${question}-${index}`,
+                                        onClick: () => onQuestionSelect(question),
+                                        className: 'suggested-prompt-card'
+                                    },
+                                    [
+                                        React.createElement(
+                                            'span',
+                                            {
+                                                key: 'badge',
+                                                className: 'suggested-prompt-badge'
+                                            },
+                                            'Ask'
+                                        ),
+                                        React.createElement(
+                                            'span',
+                                            {
+                                                key: 'text',
+                                                className: 'suggested-prompt-text'
+                                            },
+                                            question
+                                        )
+                                    ]
+                                )
+                            )
+                            : React.createElement(
+                                'div',
+                                {
+                                    className: 'suggested-prompts-empty'
+                                },
+                                'Suggested questions will appear here.'
+                            )
+                    ),
+                    React.createElement(
+                        'button',
+                        {
+                            onClick: handleNext,
+                            key: 'next',
+                            className: 'suggested-prompts-nav',
+                            'aria-label': 'Next suggested questions',
+                            disabled: staticQuestions.length === 0
+                        },
+                        '\u2192'
                     )
-            ),
-            React.createElement(
-                'button',
-                {
-                    onClick: handleNext,
-                    key: 'next',
-                    style: navigationButtonStyle,
-                    'aria-label': 'Next suggested questions',
-                    disabled: staticQuestions.length === 0
-                },
-                '→'
+                ]
             )
         ]
     );
