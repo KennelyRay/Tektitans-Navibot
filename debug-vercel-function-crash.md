@@ -28,3 +28,6 @@
 - Runtime evidence received from deployed traceback.
 - Confirmed secondary root cause: the deployed Python function bundle did not include `Data/static_qa.json`, causing `FileNotFoundError` during `load_config()`.
 - Minimal fix applied: replaced legacy `builds` config with `functions` config and explicitly included `Data/**`, `templates/**`, and `static/**` in the Python function bundle.
+- Additional build evidence received from Vercel.
+- Confirmed tertiary root cause: `functions.api/index.py.runtime` used an invalid value for built-in Python functions.
+- Minimal fix applied: removed the invalid `runtime` field and kept `includeFiles` only.
