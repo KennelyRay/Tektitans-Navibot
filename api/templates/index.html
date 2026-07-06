@@ -169,19 +169,38 @@
     </footer>
 
 <!-- Chat Interface -->
-<div id="chat-bubble">
+<div id="chat-bubble" aria-label="Open Navibot chat" role="button" tabindex="0">
+    <span class="chat-bubble-ring"></span>
     <img src="../static/images/chatbot_icon.png" alt="Robot Icon"/>
+    <span class="chat-bubble-status"></span>
 </div>
 
 <div id="chat-container">
     <div id="chat-header">
-        <img src="../static/images/chatbot_icon.png" alt="Robot Icon"/>
-        <span>Navibot</span>
+        <div class="chat-header-profile">
+            <div class="chat-header-avatar">
+                <img src="../static/images/chatbot_icon.png" alt="Robot Icon"/>
+            </div>
+            <div class="chat-header-copy">
+                <span class="chat-header-title">Navibot</span>
+                <span class="chat-header-subtitle">Enrollment Assistant</span>
+            </div>
+        </div>
         <button id="close-btn">&times;</button>
     </div>
 
     <div id="chat-box">
-        <!-- Conversation Messages Here -->
+        <div class="message-container bot intro-message">
+            <div class="avatar"></div>
+            <div class="message bot intro-card">
+                <div class="intro-badge">Online</div>
+                <div class="message-content">
+                    <p>Hello! I’m Navibot.</p>
+                    <p>I can help with enrollment questions, schedules, requirements, and other student portal guidance.</p>
+                </div>
+                <div class="message-meta">Ask a question or tap a suggested prompt below.</div>
+            </div>
+        </div>
     </div>
 
     <div id="static-questions">
@@ -192,8 +211,7 @@
         <button id="send-btn">Send</button>
     </div>
 
-    <!-- Disclaimer below the input container -->
-    <div id="disclaimer" style="padding: 10px; font-size: 0.5em; background-color: #f9f9f9; border-top: 1px solid #ccc; margin-top: 10px;">
+    <div id="disclaimer">
         Please note: Navibot is designed to help with enrollment FAQs, the information provided may not always be fully accurate or up-to-date. For important details, please verify with official school resources.
     </div>
 </div>

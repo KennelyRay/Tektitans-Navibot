@@ -1,7 +1,17 @@
 $(document).ready(function() {
-    console.log("Script loaded successfully!");
     let eventSource = null;
+    const $chatContainer = $('#chat-container');
+    const $chatInput = $('#user-input');
     $('#chat-container').removeClass('show');
+
+    function openChat() {
+        $chatContainer.addClass('show');
+        window.setTimeout(() => $chatInput.trigger('focus'), 80);
+    }
+
+    function closeChat() {
+        $chatContainer.removeClass('show');
+    }
 
     // Initialize React component
     const root = ReactDOM.createRoot(document.getElementById('static-questions'));
@@ -11,6 +21,7 @@ $(document).ready(function() {
 
     // Handle static question click
     function handleStaticQuestion(question) {
+        openChat();
         appendMessage('user', question);
         processUserInput(question);
     }
@@ -157,11 +168,26 @@ $(document).ready(function() {
     });
 
     $('#chat-bubble').click(function() {
-        $('#chat-container').toggleClass('show');
+        if ($chatContainer.hasClass('show')) {
+            closeChat();
+        } else {
+            openChat();
+        }
     });
 
     $('#close-btn').click(function() {
-        $('#chat-container').removeClass('show');
+        closeChat();
+    });
+
+    $('#chat-bubble').keypress(function(event) {
+        if (event.which === 13 || event.which === 32) {
+            event.preventDefault();
+            if ($chatContainer.hasClass('show')) {
+                closeChat();
+            } else {
+                openChat();
+            }
+        }
     });
 
     $('#send-btn').click(function() {
@@ -175,6 +201,12 @@ $(document).ready(function() {
     $('#user-input').keypress(function(event) {
         if (event.which === 13 && $('#send-btn').text() === "Send") {
             sendMessage();
+        }
+    });
+
+    $(document).keydown(function(event) {
+        if (event.key === 'Escape' && $chatContainer.hasClass('show')) {
+            closeChat();
         }
     });
 });
