@@ -33,7 +33,6 @@ ENABLE_SEMANTIC_MODELS = os.environ.get("ENABLE_SEMANTIC_MODELS", "").lower() in
 ENABLE_GENERATIVE_MODEL = os.environ.get("ENABLE_GENERATIVE_MODEL", "").lower() in {"1", "true", "yes"} and not IS_VERCEL
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini").strip() or "gpt-4o-mini"
-OPENAI_MAX_CONTEXT_ITEMS = int(os.environ.get("OPENAI_MAX_CONTEXT_ITEMS", "3"))
 BART_WEIGHT_FILES = ("pytorch_model.bin", "model.safetensors", "tf_model.h5")
 QUESTION_WORDS = {"how", "who", "what", "where", "when", "why", "which"}
 STOP_WORDS = {
@@ -41,6 +40,16 @@ STOP_WORDS = {
     "i", "in", "is", "it", "my", "of", "on", "or", "please", "the", "to", "was",
     "what", "when", "where", "which", "who", "why", "with", "you", "your",
 }
+
+
+def get_env_int(name, default):
+    try:
+        return int(os.environ.get(name, str(default)))
+    except (TypeError, ValueError):
+        return default
+
+
+OPENAI_MAX_CONTEXT_ITEMS = get_env_int("OPENAI_MAX_CONTEXT_ITEMS", 3)
 
 app = Flask(
     __name__,
@@ -474,6 +483,17 @@ def deployed_fallback_message():
     )
 
 
+def temporary_service_message(query):
+    best_question, best_score = best_static_question_score(query, preprocess_query(query)["tokens"])
+    if best_question and best_score >= 0.35:
+        return STATIC_QA[best_question]
+
+    return (
+        "I can help with enrollment questions, but the live response service is temporarily unavailable. "
+        "Please try again in a moment or ask one of the suggested questions below."
+    )
+
+
 def build_context_block(query):
     matches = get_top_static_matches(query, limit=OPENAI_MAX_CONTEXT_ITEMS)
     relevant_matches = [match for match in matches if match[0] >= 0.2]
@@ -492,7 +512,9 @@ def build_context_block(query):
 def stream_openai_response(prompt):
     client = get_openai_client()
     if not client:
-        return False
+        yield format_response(deployed_fallback_message())
+        yield "[END]"
+        return
 
     system_prompt = (
         "You are NaviBot, a helpful enrollment assistant for SAMCIS students, especially BSIT and BSCS. "
@@ -504,31 +526,32 @@ def stream_openai_response(prompt):
     )
     faq_context = build_context_block(prompt)
 
-    stream = client.chat.completions.create(
-        model=OPENAI_MODEL,
-        temperature=0.2,
-        stream=True,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "system", "content": f"Relevant FAQ context:\n{faq_context}"},
-            {"role": "user", "content": prompt},
-        ],
-    )
+    try:
+        stream = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            temperature=0.2,
+            stream=True,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": f"Relevant FAQ context:\n{faq_context}"},
+                {"role": "user", "content": prompt},
+            ],
+        )
 
-    accumulated_response = ""
-    for chunk in stream:
-        delta = ""
-        choices = getattr(chunk, "choices", None) or []
-        if choices:
-            delta = getattr(choices[0].delta, "content", "") or ""
-        if not delta:
-            continue
+        accumulated_response = ""
+        for chunk in stream:
+            delta = ""
+            choices = getattr(chunk, "choices", None) or []
+            if choices:
+                delta = getattr(choices[0].delta, "content", "") or ""
+            if not delta:
+                continue
 
-        accumulated_response += delta
-        yield format_response(accumulated_response)
-
+            accumulated_response += delta
+            yield format_response(accumulated_response)
+    except Exception:
+        yield format_response(temporary_service_message(prompt))
     yield "[END]"
-    return True
 
 
 def generate_response_stream(prompt):
@@ -630,7 +653,7 @@ def chat_stream():
                     yield f"data: {response}\n\n"
         except Exception as exc:
             print(f"Error in generate(): {exc}")
-            error_msg = format_response("I apologize, but I encountered an error.")
+            error_msg = format_response(temporary_service_message(user_input))
             yield f"data: {error_msg}\n\n"
             yield "data: [END]\n\n"
 

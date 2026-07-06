@@ -1,6 +1,7 @@
 $(document).ready(function() {
     console.log("Script loaded successfully!");
     let eventSource = null;
+    $('#chat-container').removeClass('show');
 
     // Initialize React component
     const root = ReactDOM.createRoot(document.getElementById('static-questions'));
@@ -109,11 +110,11 @@ $(document).ready(function() {
     });
 
     $('#chat-bubble').click(function() {
-        $('#chat-container').toggle();
+        $('#chat-container').toggleClass('show');
     });
 
     $('#close-btn').click(function() {
-        $('#chat-container').hide();
+        $('#chat-container').removeClass('show');
     });
 
     $('#send-btn').click(function() {
