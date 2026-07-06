@@ -149,6 +149,12 @@
     border-radius: 15px 15px 15px 0;
 }
 
+.message-meta {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #5f6b7a;
+}
+
 /* Adjusting bot message content */
 .message.bot p, .message.bot ol, .message.bot ul {
     margin: 0;

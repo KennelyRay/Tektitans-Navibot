@@ -50,6 +50,7 @@ def get_env_int(name, default):
 
 
 OPENAI_MAX_CONTEXT_ITEMS = get_env_int("OPENAI_MAX_CONTEXT_ITEMS", 3)
+OPENAI_MAX_TOKENS = get_env_int("OPENAI_MAX_TOKENS", 300)
 
 app = Flask(
     __name__,
@@ -476,6 +477,10 @@ def split_into_safe_chunks(text):
     return re.findall(r"[^.!?]+[.!?]?", text, re.DOTALL)
 
 
+def build_meta_event(**payload):
+    return f"event: meta\ndata: {json.dumps(payload)}\n\n"
+
+
 def deployed_fallback_message():
     return (
         "I can answer common enrollment questions, but the AI response service is not configured yet. "
@@ -512,6 +517,7 @@ def build_context_block(query):
 def stream_openai_response(prompt):
     client = get_openai_client()
     if not client:
+        yield build_meta_event(source="fallback", reason="missing_openai_key")
         yield format_response(deployed_fallback_message())
         yield "[END]"
         return
@@ -530,7 +536,9 @@ def stream_openai_response(prompt):
         stream = client.chat.completions.create(
             model=OPENAI_MODEL,
             temperature=0.2,
+            max_tokens=OPENAI_MAX_TOKENS,
             stream=True,
+            stream_options={"include_usage": True},
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "system", "content": f"Relevant FAQ context:\n{faq_context}"},
@@ -539,7 +547,19 @@ def stream_openai_response(prompt):
         )
 
         accumulated_response = ""
+        sent_source_meta = False
         for chunk in stream:
+            usage = getattr(chunk, "usage", None)
+            if usage is not None:
+                yield build_meta_event(
+                    source="openai",
+                    model=OPENAI_MODEL,
+                    prompt_tokens=getattr(usage, "prompt_tokens", None),
+                    completion_tokens=getattr(usage, "completion_tokens", None),
+                    total_tokens=getattr(usage, "total_tokens", None),
+                    max_tokens=OPENAI_MAX_TOKENS,
+                )
+
             delta = ""
             choices = getattr(chunk, "choices", None) or []
             if choices:
@@ -547,9 +567,18 @@ def stream_openai_response(prompt):
             if not delta:
                 continue
 
+            if not sent_source_meta:
+                yield build_meta_event(
+                    source="openai",
+                    model=OPENAI_MODEL,
+                    max_tokens=OPENAI_MAX_TOKENS,
+                )
+                sent_source_meta = True
+
             accumulated_response += delta
             yield format_response(accumulated_response)
     except Exception:
+        yield build_meta_event(source="fallback", reason="openai_error")
         yield format_response(temporary_service_message(prompt))
     yield "[END]"
 
@@ -604,6 +633,7 @@ def health():
         "generative_model_enabled": ENABLE_GENERATIVE_MODEL,
         "openai_enabled": bool(OPENAI_API_KEY),
         "openai_model": OPENAI_MODEL,
+        "openai_max_tokens": OPENAI_MAX_TOKENS,
         "vercel": IS_VERCEL,
     }
 
@@ -635,12 +665,14 @@ def chat_stream():
                 return
 
             if result["status"] == "not_relevant":
+                yield build_meta_event(source="relevancy_guard")
                 formatted_response = format_response(result["message"])
                 yield f"data: {formatted_response}\n\n"
                 yield "data: [END]\n\n"
                 return
 
             if result["status"] == "static_answer":
+                yield build_meta_event(source="static_qa")
                 formatted_response = format_response(result["message"])
                 yield f"data: {formatted_response}\n\n"
                 yield "data: [END]\n\n"
@@ -649,6 +681,8 @@ def chat_stream():
             for response in generate_response_stream(user_input):
                 if response == "[END]":
                     yield "data: [END]\n\n"
+                elif response.startswith("event: meta\n"):
+                    yield response
                 else:
                     yield f"data: {response}\n\n"
         except Exception as exc:
