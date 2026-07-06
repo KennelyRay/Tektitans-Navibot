@@ -36,8 +36,8 @@ $(document).ready(function() {
         if (!botMessage.length) return;
 
         let metaText = '';
-        if (meta.source === 'openai') {
-            metaText = `Source: OpenAI`;
+        if (meta.source === 'openrouter') {
+            metaText = `Source: OpenRouter`;
             if (meta.completion_tokens != null || meta.total_tokens != null) {
                 const tokenParts = [];
                 if (meta.prompt_tokens != null) tokenParts.push(`prompt ${meta.prompt_tokens}`);

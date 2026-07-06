@@ -31,8 +31,10 @@ FINE_TUNED_BART_DIR = BASE_DIR / "output" / "fine-tuned-bart"
 IS_VERCEL = bool(os.environ.get("VERCEL")) or bool(os.environ.get("VERCEL_ENV"))
 ENABLE_SEMANTIC_MODELS = os.environ.get("ENABLE_SEMANTIC_MODELS", "").lower() in {"1", "true", "yes"} and not IS_VERCEL
 ENABLE_GENERATIVE_MODEL = os.environ.get("ENABLE_GENERATIVE_MODEL", "").lower() in {"1", "true", "yes"} and not IS_VERCEL
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini").strip() or "gpt-4o-mini"
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
+OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini").strip() or "openai/gpt-4o-mini"
+OPENROUTER_SITE_URL = os.environ.get("OPENROUTER_SITE_URL", "").strip()
+OPENROUTER_APP_NAME = os.environ.get("OPENROUTER_APP_NAME", "Tektitans-Navibot").strip() or "Tektitans-Navibot"
 BART_WEIGHT_FILES = ("pytorch_model.bin", "model.safetensors", "tf_model.h5")
 QUESTION_WORDS = {"how", "who", "what", "where", "when", "why", "which"}
 STOP_WORDS = {
@@ -49,8 +51,8 @@ def get_env_int(name, default):
         return default
 
 
-OPENAI_MAX_CONTEXT_ITEMS = get_env_int("OPENAI_MAX_CONTEXT_ITEMS", 3)
-OPENAI_MAX_TOKENS = get_env_int("OPENAI_MAX_TOKENS", 300)
+OPENROUTER_MAX_CONTEXT_ITEMS = get_env_int("OPENROUTER_MAX_CONTEXT_ITEMS", 3)
+OPENROUTER_MAX_TOKENS = get_env_int("OPENROUTER_MAX_TOKENS", 300)
 
 app = Flask(
     __name__,
@@ -84,8 +86,8 @@ topic_embeddings = None
 generation_model = None
 generation_tokenizer = None
 generation_model_checked = False
-openai_client = None
-openai_client_checked = False
+llm_client = None
+llm_client_checked = False
 
 
 def tokenize_text(text):
@@ -199,26 +201,29 @@ def get_generation_model():
     return generation_model, generation_tokenizer
 
 
-def get_openai_client():
-    global openai_client
-    global openai_client_checked
+def get_llm_client():
+    global llm_client
+    global llm_client_checked
 
-    if openai_client_checked:
-        return openai_client
+    if llm_client_checked:
+        return llm_client
 
-    openai_client_checked = True
-    if not OPENAI_API_KEY:
+    llm_client_checked = True
+    if not OPENROUTER_API_KEY:
         return None
 
     try:
         from openai import OpenAI
 
-        openai_client = OpenAI(api_key=OPENAI_API_KEY)
+        llm_client = OpenAI(
+            api_key=OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+        )
     except Exception as exc:
-        print(f"Unable to initialize OpenAI client: {exc}")
-        openai_client = None
+        print(f"Unable to initialize OpenRouter client: {exc}")
+        llm_client = None
 
-    return openai_client
+    return llm_client
 
 
 def question_similarity_score(query, query_tokens, question):
@@ -484,7 +489,7 @@ def build_meta_event(**payload):
 def deployed_fallback_message():
     return (
         "I can answer common enrollment questions, but the AI response service is not configured yet. "
-        "Add OPENAI_API_KEY in Vercel environment variables to enable generated answers."
+        "Add OPENROUTER_API_KEY in Vercel environment variables to enable generated answers."
     )
 
 
@@ -500,7 +505,7 @@ def temporary_service_message(query):
 
 
 def build_context_block(query):
-    matches = get_top_static_matches(query, limit=OPENAI_MAX_CONTEXT_ITEMS)
+    matches = get_top_static_matches(query, limit=OPENROUTER_MAX_CONTEXT_ITEMS)
     relevant_matches = [match for match in matches if match[0] >= 0.2]
 
     if not relevant_matches:
@@ -514,10 +519,10 @@ def build_context_block(query):
     return "\n\n".join(context_lines)
 
 
-def stream_openai_response(prompt):
-    client = get_openai_client()
+def stream_openrouter_response(prompt):
+    client = get_llm_client()
     if not client:
-        yield build_meta_event(source="fallback", reason="missing_openai_key")
+        yield build_meta_event(source="fallback", reason="missing_openrouter_key")
         yield format_response(deployed_fallback_message())
         yield "[END]"
         return
@@ -533,12 +538,19 @@ def stream_openai_response(prompt):
     faq_context = build_context_block(prompt)
 
     try:
+        extra_headers = {}
+        if OPENROUTER_SITE_URL:
+            extra_headers["HTTP-Referer"] = OPENROUTER_SITE_URL
+        if OPENROUTER_APP_NAME:
+            extra_headers["X-Title"] = OPENROUTER_APP_NAME
+
         stream = client.chat.completions.create(
-            model=OPENAI_MODEL,
+            model=OPENROUTER_MODEL,
             temperature=0.2,
-            max_tokens=OPENAI_MAX_TOKENS,
+            max_tokens=OPENROUTER_MAX_TOKENS,
             stream=True,
             stream_options={"include_usage": True},
+            extra_headers=extra_headers or None,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "system", "content": f"Relevant FAQ context:\n{faq_context}"},
@@ -552,12 +564,12 @@ def stream_openai_response(prompt):
             usage = getattr(chunk, "usage", None)
             if usage is not None:
                 yield build_meta_event(
-                    source="openai",
-                    model=OPENAI_MODEL,
+                    source="openrouter",
+                    model=OPENROUTER_MODEL,
                     prompt_tokens=getattr(usage, "prompt_tokens", None),
                     completion_tokens=getattr(usage, "completion_tokens", None),
                     total_tokens=getattr(usage, "total_tokens", None),
-                    max_tokens=OPENAI_MAX_TOKENS,
+                    max_tokens=OPENROUTER_MAX_TOKENS,
                 )
 
             delta = ""
@@ -569,24 +581,24 @@ def stream_openai_response(prompt):
 
             if not sent_source_meta:
                 yield build_meta_event(
-                    source="openai",
-                    model=OPENAI_MODEL,
-                    max_tokens=OPENAI_MAX_TOKENS,
+                    source="openrouter",
+                    model=OPENROUTER_MODEL,
+                    max_tokens=OPENROUTER_MAX_TOKENS,
                 )
                 sent_source_meta = True
 
             accumulated_response += delta
             yield format_response(accumulated_response)
     except Exception:
-        yield build_meta_event(source="fallback", reason="openai_error")
+        yield build_meta_event(source="fallback", reason="openrouter_error")
         yield format_response(temporary_service_message(prompt))
     yield "[END]"
 
 
 def generate_response_stream(prompt):
-    openai_enabled = bool(get_openai_client())
-    if openai_enabled:
-        for chunk in stream_openai_response(prompt):
+    llm_enabled = bool(get_llm_client())
+    if llm_enabled:
+        for chunk in stream_openrouter_response(prompt):
             yield chunk
         return
 
@@ -631,9 +643,10 @@ def health():
         "status": "ok",
         "semantic_models_enabled": ENABLE_SEMANTIC_MODELS,
         "generative_model_enabled": ENABLE_GENERATIVE_MODEL,
-        "openai_enabled": bool(OPENAI_API_KEY),
-        "openai_model": OPENAI_MODEL,
-        "openai_max_tokens": OPENAI_MAX_TOKENS,
+        "openrouter_enabled": bool(OPENROUTER_API_KEY),
+        "openrouter_model": OPENROUTER_MODEL,
+        "openrouter_max_context_items": OPENROUTER_MAX_CONTEXT_ITEMS,
+        "openrouter_max_tokens": OPENROUTER_MAX_TOKENS,
         "vercel": IS_VERCEL,
     }
 
