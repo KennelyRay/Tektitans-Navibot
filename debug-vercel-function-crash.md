@@ -22,4 +22,6 @@
 
 ## Status
 - Session opened.
-- No business logic changed yet.
+- Evidence received from Vercel build logs.
+- Confirmed root cause: Vercel builder could not statically find a top-level `app`, `application`, or `handler` symbol in `api/index.py`.
+- Minimal fix applied: declared `app = Flask(__name__)` at module top level so Vercel can detect the entrypoint, while preserving bootstrap instrumentation.

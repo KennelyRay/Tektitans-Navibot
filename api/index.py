@@ -8,6 +8,7 @@ from flask import Flask, Response
 
 BOOT_ERROR = None
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+app = Flask(__name__)
 
 #region debug-point bootstrap-import
 try:
@@ -18,7 +19,6 @@ try:
     app = flask_app
 except Exception:
     BOOT_ERROR = traceback.format_exc()
-    app = Flask(__name__)
 
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
