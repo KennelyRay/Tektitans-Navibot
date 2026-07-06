@@ -3,7 +3,7 @@
   "version": 2,
   "functions": {
     "api/index.py": {
-      "includeFiles": "{Data/**,templates/**,static/**}"
+      "includeFiles": "**/*"
     }
   },
   "routes": [

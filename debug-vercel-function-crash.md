@@ -31,3 +31,6 @@
 - Additional build evidence received from Vercel.
 - Confirmed tertiary root cause: `functions.api/index.py.runtime` used an invalid value for built-in Python functions.
 - Minimal fix applied: removed the invalid `runtime` field and kept `includeFiles` only.
+- Additional runtime evidence received from deployed traceback after redeploy.
+- Observed that the narrower `includeFiles` pattern still did not place `Data/static_qa.json` into the function bundle.
+- Minimal fix applied: broadened `includeFiles` to `**/*`, relying on `.vercelignore` to keep heavy artifacts out while ensuring required runtime assets are bundled.
