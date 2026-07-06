@@ -522,7 +522,12 @@ def build_context_block(query):
 def stream_openrouter_response(prompt):
     client = get_llm_client()
     if not client:
-        yield build_meta_event(source="fallback", reason="missing_openrouter_key")
+        yield build_meta_event(
+            source="fallback",
+            reason="missing_openrouter_key",
+            openrouter_key_present=bool(OPENROUTER_API_KEY),
+            openrouter_model=OPENROUTER_MODEL,
+        )
         yield format_response(deployed_fallback_message())
         yield "[END]"
         return
@@ -589,8 +594,13 @@ def stream_openrouter_response(prompt):
 
             accumulated_response += delta
             yield format_response(accumulated_response)
-    except Exception:
-        yield build_meta_event(source="fallback", reason="openrouter_error")
+    except Exception as exc:
+        yield build_meta_event(
+            source="fallback",
+            reason="openrouter_error",
+            openrouter_model=OPENROUTER_MODEL,
+            error=str(exc)[:300],
+        )
         yield format_response(temporary_service_message(prompt))
     yield "[END]"
 
@@ -644,9 +654,12 @@ def health():
         "semantic_models_enabled": ENABLE_SEMANTIC_MODELS,
         "generative_model_enabled": ENABLE_GENERATIVE_MODEL,
         "openrouter_enabled": bool(OPENROUTER_API_KEY),
+        "openrouter_key_present": bool(OPENROUTER_API_KEY),
         "openrouter_model": OPENROUTER_MODEL,
         "openrouter_max_context_items": OPENROUTER_MAX_CONTEXT_ITEMS,
         "openrouter_max_tokens": OPENROUTER_MAX_TOKENS,
+        "openrouter_site_url": OPENROUTER_SITE_URL,
+        "openrouter_app_name": OPENROUTER_APP_NAME,
         "vercel": IS_VERCEL,
     }
 

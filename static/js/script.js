@@ -51,6 +51,12 @@ $(document).ready(function() {
             metaText = 'Source: Enrollment filter';
         } else if (meta.source === 'fallback') {
             metaText = 'Source: Fallback response';
+            if (meta.reason) {
+                metaText += ` (${meta.reason})`;
+            }
+            if (meta.error) {
+                metaText += ` - ${meta.error}`;
+            }
         }
 
         if (!metaText) return;
