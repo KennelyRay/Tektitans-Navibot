@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b6bd0cd9-c6e0-462c-9d78-0133bfec867f" name="Changes" comment="update">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Bart_Bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bart_Bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/non_academic_contexts.json" beforeDir="false" afterPath="$PROJECT_DIR$/Data/non_academic_contexts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/static_qa.json" beforeDir="false" afterPath="$PROJECT_DIR$/Data/static_qa.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/css/chatbot.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/chatbot.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Jermin-Odcheo&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/JohnAzurin/Tektitans-Navibot.git&quot;,
+    &quot;accountId&quot;: &quot;73fb48fa-26b1-4758-9c45-01d7e0581bdb&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <hideBySeverity>
+      <option value="200" />
+      <option value="300" />
+    </hideBySeverity>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2n42s1DNzPJCUk38JhoElvn4N29" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Flask server.Chatbot NaviBot.executor&quot;: &quot;Run&quot;,
+    &quot;Flask server.Flask (Bart_Bot.py).executor&quot;: &quot;Run&quot;,
+    &quot;Flask server.Flask (GPT_Bot.py).executor&quot;: &quot;Run&quot;,
+    &quot;Flask server.Flask (Navi.py).executor&quot;: &quot;Run&quot;,
+    &quot;Flask server.Flask (Test_BARTBOT.py).executor&quot;: &quot;Run&quot;,
+    &quot;Flask server.Flask (app.py).executor&quot;: &quot;Run&quot;,
+    &quot;Python.BART_Chat.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Bart_Bot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.BertScore.executor&quot;: &quot;Run&quot;,
+    &quot;Python.BertScore_Bard.executor&quot;: &quot;Run&quot;,
+    &quot;Python.BertScore_Bart (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.Chatbot NaviBot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Testbot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Trainer.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Trainer_Bart (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.Trainer_Bart.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Trainer_Bert.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Trainer_GPT.executor&quot;: &quot;Run&quot;,
+    &quot;Python._Chatbot Test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.model_evaluation.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;MODEL__Bart&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jermi/PycharmProjects/Chatbot NaviBot&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot" />
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\Data" />
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\Data Process" />
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\Data\LSVM" />
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\output" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\Data Process" />
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\Data" />
+      <recent name="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\Data\LSVM" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.Bart_Bot">
+    <configuration name="Bart_Bot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Tektitans-Navibot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Bart_Bot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="BertScore_Bart (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Chatbot NaviBot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/BertScore_Bart.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="BertScore_Bart" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Chatbot NaviBot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\jermi\PycharmProjects\Chatbot NaviBot\BertScore_Bart.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Chatbot NaviBot" type="PythonConfigurationType" factoryName="Python">
+      <module name="Chatbot NaviBot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GPT_Bot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Trainer_Bart" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Chatbot NaviBot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Trainer_Bart.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Chatbot NaviBot" type="Python.FlaskServer">
+      <module name="Chatbot NaviBot" />
+      <option name="target" value="$PROJECT_DIR$/Bart_Bot.py" />
+      <option name="targetType" value="PATH" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Flask (Bart_Bot.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
+      <module name="Chatbot NaviBot" />
+      <option name="target" value="$PROJECT_DIR$/Bart_Bot.py" />
+      <option name="targetType" value="PATH" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.Bart_Bot" />
+        <item itemvalue="Flask server.Flask (Bart_Bot.py)" />
+        <item itemvalue="Python.Trainer_Bart" />
+        <item itemvalue="Python.BertScore_Bart (1)" />
+        <item itemvalue="Python.BertScore_Bart" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23339.19" />
+        <option value="bundled-python-sdk-0029f7779945-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23339.19" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b6bd0cd9-c6e0-462c-9d78-0133bfec867f" name="Changes" comment="" />
+      <created>1728218230332</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1728218230332</updated>
+      <workItem from="1728218231375" duration="11848000" />
+      <workItem from="1728265715514" duration="2904000" />
+      <workItem from="1728268926786" duration="20000" />
+      <workItem from="1728268961885" duration="31648000" />
+      <workItem from="1728347162491" duration="8358000" />
+      <workItem from="1728357700618" duration="15618000" />
+      <workItem from="1728386880049" duration="284000" />
+      <workItem from="1728387173128" duration="6854000" />
+      <workItem from="1728558699395" duration="25000" />
+      <workItem from="1728558727812" duration="30352000" />
+      <workItem from="1728646381551" duration="11025000" />
+      <workItem from="1728705229813" duration="13555000" />
+      <workItem from="1728896858755" duration="5116000" />
+      <workItem from="1728912489864" duration="12213000" />
+      <workItem from="1728957362522" duration="1371000" />
+      <workItem from="1728958798627" duration="982000" />
+      <workItem from="1728961016846" duration="25795000" />
+      <workItem from="1729043290958" duration="11854000" />
+      <workItem from="1729089988876" duration="7440000" />
+      <workItem from="1729127305569" duration="44362000" />
+      <workItem from="1729215945530" duration="27311000" />
+      <workItem from="1729268030221" duration="1273000" />
+      <workItem from="1729269749945" duration="20803000" />
+      <workItem from="1729355330842" duration="62000" />
+      <workItem from="1729356672522" duration="4194000" />
+      <workItem from="1729402898079" duration="14072000" />
+      <workItem from="1729424395787" duration="25525000" />
+      <workItem from="1729486289289" duration="9492000" />
+      <workItem from="1729510679148" duration="16825000" />
+      <workItem from="1729559118834" duration="91200000" />
+      <workItem from="1729744886625" duration="2508000" />
+      <workItem from="1729751222130" duration="3370000" />
+      <workItem from="1729761362179" duration="8174000" />
+      <workItem from="1729775976536" duration="7728000" />
+      <workItem from="1729785052214" duration="4181000" />
+      <workItem from="1729819382794" duration="8690000" />
+      <workItem from="1729833904554" duration="295000" />
+      <workItem from="1729834425521" duration="8533000" />
+      <workItem from="1729848376773" duration="6767000" />
+      <workItem from="1729859014588" duration="20871000" />
+      <workItem from="1729924476238" duration="32168000" />
+      <workItem from="1730037519792" duration="21680000" />
+      <workItem from="1730118496176" duration="42721000" />
+      <workItem from="1730252128021" duration="1715000" />
+      <workItem from="1730254246651" duration="10420000" />
+      <workItem from="1730270719661" duration="47973000" />
+      <workItem from="1730387871206" duration="120000" />
+      <workItem from="1730390874721" duration="24513000" />
+      <workItem from="1730457835329" duration="263000" />
+      <workItem from="1730460798153" duration="1468000" />
+      <workItem from="1730468959407" duration="12750000" />
+      <workItem from="1730549258068" duration="40621000" />
+      <workItem from="1730652967309" duration="17733000" />
+      <workItem from="1730734296297" duration="28098000" />
+      <workItem from="1730802868552" duration="3893000" />
+      <workItem from="1730806995935" duration="226000" />
+      <workItem from="1730807231430" duration="910000" />
+      <workItem from="1730819623951" duration="123130000" />
+      <workItem from="1731203670210" duration="6928000" />
+      <workItem from="1731230811358" duration="39405000" />
+      <workItem from="1731391462711" duration="34852000" />
+      <workItem from="1731462720752" duration="31359000" />
+      <workItem from="1731549332934" duration="11313000" />
+      <workItem from="1731568967240" duration="921000" />
+      <workItem from="1731570497534" duration="756000" />
+      <workItem from="1731571768133" duration="6160000" />
+      <workItem from="1731586838405" duration="312000" />
+      <workItem from="1731588966691" duration="9698000" />
+      <workItem from="1731645010416" duration="18824000" />
+      <workItem from="1731720755339" duration="23380000" />
+      <workItem from="1731885083939" duration="31796000" />
+      <workItem from="1731934620108" duration="422000" />
+      <workItem from="1731935400193" duration="24094000" />
+      <workItem from="1731985777353" duration="805000" />
+      <workItem from="1731986803022" duration="29819000" />
+      <workItem from="1732031177464" duration="341000" />
+      <workItem from="1732031528632" duration="4627000" />
+      <workItem from="1738889546616" duration="177000" />
+      <workItem from="1739108461736" duration="3457000" />
+      <workItem from="1739147189637" duration="7303000" />
+    </task>
+    <task id="LOCAL-00001" summary="Initial">
+      <option name="closed" value="true" />
+      <created>1728386781156</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1728386781156</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Initial">
+      <option name="closed" value="true" />
+      <created>1728387596390</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1728387596390</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Update Batch1_train.json&#10;Update Trainer_Bart.py , add special tokens&#10;Update UI&#10;Add animation on chatbot">
+      <option name="closed" value="true" />
+      <created>1729261253917</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1729261253917</updated>
+    </task>
+    <task id="LOCAL-00004" summary="MISCELLANEOUS &#10;Convert CSV to JSON&#10;Convert JSON to CSV&#10;Data Augmentation and Cleaning&#10;Update Data">
+      <option name="closed" value="true" />
+      <created>1729426038160</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1729426038160</updated>
+    </task>
+    <task id="LOCAL-00005" summary="update">
+      <option name="closed" value="true" />
+      <created>1729507202392</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1729507202392</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Update Data Set&#10;Update Model Configuration&#10;--------------------------">
+      <option name="closed" value="true" />
+      <created>1731168617535</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1731168617535</updated>
+    </task>
+    <task id="LOCAL-00007" summary="updated tokenization and changed evaluation set to 10% validation, and 10% unseen data">
+      <option name="closed" value="true" />
+      <created>1731403772152</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1731403772153</updated>
+    </task>
+    <task id="LOCAL-00008" summary="update the format responses">
+      <option name="closed" value="true" />
+      <created>1731428481498</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1731428481498</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Add Q AND A">
+      <option name="closed" value="true" />
+      <created>1732021667615</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1732021667615</updated>
+    </task>
+    <task id="LOCAL-00010" summary="update">
+      <option name="closed" value="true" />
+      <created>1738889711016</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1738889711016</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial" />
+    <MESSAGE value="Update Batch1_train.json&#10;Update Trainer_Bart.py , add special tokens&#10;Update UI&#10;Add animation on chatbot" />
+    <MESSAGE value="MISCELLANEOUS &#10;Convert CSV to JSON&#10;Convert JSON to CSV&#10;Data Augmentation and Cleaning&#10;Update Data" />
+    <MESSAGE value="Update Data Set&#10;Update Model Configuration&#10;--------------------------" />
+    <MESSAGE value="updated tokenization and changed evaluation set to 10% validation, and 10% unseen data" />
+    <MESSAGE value="update the format responses" />
+    <MESSAGE value="Add Q AND A" />
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Trainer_Bart.coverage" NAME="Trainer_Bart Coverage Results" MODIFIED="1732031541040" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Flask__Navi_py_.coverage" NAME="Flask (Navi.py) Coverage Results" MODIFIED="1728386278156" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$model_evaluation.coverage" NAME="model_evaluation Coverage Results" MODIFIED="1728375235672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$_Chatbot_Test.coverage" NAME="_Chatbot Test Coverage Results" MODIFIED="1728349939426" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Flask__GPT_Bot_py_.coverage" NAME="Flask (GPT_Bot.py) Coverage Results" MODIFIED="1728393995136" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$BART_Chat.coverage" NAME="BART_Chat Coverage Results" MODIFIED="1729166750821" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$BertScore_Bart__1_.coverage" NAME="BertScore_Bart (1) Coverage Results" MODIFIED="1732021815378" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Trainer.coverage" NAME="Trainer Coverage Results" MODIFIED="1728375605213" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Flask__app_py_.coverage" NAME="Flask (Bart_Bot.py) Coverage Results" MODIFIED="1728386579580" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Testbot.coverage" NAME="Testbot Coverage Results" MODIFIED="1728999874498" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Flask__Test_BARTBOT_py_.coverage" NAME="Flask (Test_BARTBOT.py) Coverage Results" MODIFIED="1728962941613" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$BertScore_Bard.coverage" NAME="BertScore_Bard Coverage Results" MODIFIED="1730394622201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Trainer_Bart__1_.coverage" NAME="Trainer_Bart (1) Coverage Results" MODIFIED="1731567760598" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Trainer_GPT.coverage" NAME="Trainer_GPT Coverage Results" MODIFIED="1728750489123" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Flask__Bart_Bot_py_.coverage" NAME="Flask (Bart_Bot.py) Coverage Results" MODIFIED="1732037485130" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Tektitans_Navibot$Bart_Bot.coverage" NAME="Bart_Bot Coverage Results" MODIFIED="1739150068211" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Chatbot_NaviBot.coverage" NAME="Chatbot NaviBot Coverage Results" MODIFIED="1731935447439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$Trainer_Bert.coverage" NAME="Trainer_Bert Coverage Results" MODIFIED="1728275599297" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Chatbot_NaviBot$BertScore.coverage" NAME="BertScore Coverage Results" MODIFIED="1728750850284" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

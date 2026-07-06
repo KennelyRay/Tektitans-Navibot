@@ -1,0 +1,42 @@
+{
+  "builder_name": "json",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "json",
+  "dataset_size": 19705,
+  "description": "",
+  "download_checksums": {
+    "C:/Users/jermi/PycharmProjects/Chatbot NaviBot/data/Batch1_Train.json": {
+      "num_bytes": 22549,
+      "checksum": null
+    }
+  },
+  "download_size": 22549,
+  "features": {
+    "question": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "answer": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 42254,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 19705,
+      "num_examples": 50,
+      "dataset_name": "json"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

@@ -1,0 +1,327 @@
+/* Chat Bubble */
+#chat-bubble {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 30px;
+    line-height: 60px;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: 1px solid #032c58;
+    background-color: #012a57; /* Added background color */
+}
+
+#chat-bubble img {
+    width: 40px; /* Adjust width of the image */
+    height: 40px; /* Adjust height of the image */
+}
+
+#chat-bubble:hover {
+    background-color: #0f284b;
+    transform: scale(1.1);
+}
+
+/* Chat Container */
+#chat-container {
+    display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 700px;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+#chat-container.show {
+    display: flex; /* Makes the container a flex container when shown */
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Chat Header */
+#chat-header {
+    background-color: #012a57;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    flex-shrink: 0;
+}
+
+#chat-header span {
+    flex: auto;
+    padding-left: 10px;
+}
+
+/* Chat Header Image */
+#chat-header img {
+    width: 40px;  /* Adjust the width */
+    height: 40px; /* Adjust the height */
+    border-radius: 50%; /* Makes it a circular avatar */
+    object-fit: cover; /* Ensures the image scales well within the circle */
+}
+
+/* Close button */
+#close-btn {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Chat Box */
+#chat-box {
+    flex: 1; 
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+/* Message Styles */
+.message-container {
+    display: flex;
+    align-items: flex-start;
+    margin: 5px 0;
+}
+
+.message-container.user {
+    justify-content: flex-end;
+}
+
+.message-container.bot {
+    justify-content: flex-start;
+}
+
+.message-container .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 10px;
+    background-size: cover;
+}
+
+.message-container.user .avatar {
+    background-image: url("../images/user_icon.png");
+}
+
+.message-container.bot .avatar {
+    background-image: url("../images/chatbot_icon.png");
+}
+
+.message {
+    padding: 12px 16px;
+    max-width: 75%;
+}
+
+.message.user {
+    background-color: #023e7e;
+    color: white;
+    border-radius: 15px 15px 0 15px;
+}
+.chatbot-response {
+
+    text-align: justify;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+.message.bot {
+    background-color: #e6e9ed;
+    color: #333;
+    border-radius: 15px 15px 15px 0;
+}
+
+/* Adjusting bot message content */
+.message.bot p, .message.bot ol, .message.bot ul {
+    margin: 0;
+    padding: 0;
+}
+
+.message.bot ol {
+    list-style-position: inside;
+    padding-left: 0;
+}
+
+.message.bot ol li, .message.bot ul li {
+    margin: 0;
+    padding: 0;
+}
+
+.message.bot strong {
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
+    color: #024791;
+}
+
+/* Typing indicator */
+.typing-indicator-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.typing-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: #999;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+.typing-indicator:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+}
+
+/* Input Container */
+#input-container {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background-color: #f1f3f5;
+    border-top: 1px solid #ddd;
+}
+
+#user-input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #e9ecef;
+}
+
+#send-btn {
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: #012a57;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#user-input:focus {
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px #007bff;
+}
+
+#send-btn:hover {
+    background-color: #0f284b;
+}
+
+/* Remove all the old carousel and slick-related styles */
+/* Add these new styles */
+
+#static-questions {
+    flex-shrink: 0;  /* Prevents shrinking */
+    background-color: white;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+/* Styling for the Static Questions Buttons */
+#static-questions {
+    flex-shrink: 0;  
+    background-color: white;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    min-height: 40px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow-x: auto;
+}
+
+#static-questions p {
+    margin: 5px;
+    padding: 8px 12px;
+    background-color: #e6e9ed;
+    color: #024791;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .carousel .question {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 576px) {
+    .carousel .question {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Scroll Buttons (Optional Enhancements) */
+.scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1;
+    font-size: 14px;
+    color: #666;
+}
+
+.scroll-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* Positioning Scroll Buttons within Carousel (Optional) */
+#static-questions {
+    position: relative; /* To position scroll buttons absolutely within */
+    background: white;
+    border-bottom: 1px solid #0f284b; /* Adds a light blue border */
+}
+
+#static-questions .scroll-btn.prev {
+    left: 0;
+}
+
+#static-questions .scroll-btn.next {
+    right: 0;
+}
