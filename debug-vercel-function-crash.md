@@ -34,3 +34,6 @@
 - Additional runtime evidence received from deployed traceback after redeploy.
 - Observed that the narrower `includeFiles` pattern still did not place `Data/static_qa.json` into the function bundle.
 - Minimal fix applied: broadened `includeFiles` to `**/*`, relying on `.vercelignore` to keep heavy artifacts out while ensuring required runtime assets are bundled.
+- Additional runtime evidence received from deployed traceback after broader include.
+- Confirmed that Vercel still did not expose the root-level `Data` directory to the running function at `/var/task/Data/...`.
+- Minimal fix applied: mirrored required runtime assets under `api/` and updated `Bart_Bot.py` to fall back to `api/Data`, `api/templates`, and `api/static` when root-level assets are unavailable.

@@ -1,0 +1,52 @@
+{
+    "contexts": {
+        "keywords": [
+            "SEA", "AR", "ArchMath", "EnggChem", "CHE", "Chem", "EnggCAD", "CEOr",
+            "EnggMath", "EnggPhys", "EnggPhysL", "EE", "ECE", "GE", "IE", "EnggDraw",
+            "MEC", "EM", "Engineering", "Electric", "Industrial", "Chemical", "LAW",
+            "Criminal", "Constitution", "Legal","pera","Medicine", "SOM", "MBiol", "MLS",
+            "CYTO", "BIO", "medical", "pharmacy", "PHARMA", "Radiologic", "Rad",
+            "STELA", "STL", "COM", "PHILOS", "POS", "Teacher", "BEED", "EDUC", "COMDP",
+            "SOC", "psychology", "ELT", "WK"
+        ],
+        "schools": [
+            "Cordillera", "UC", "UB", "BCF", "BCU", "Central", "Pines", "PCC",
+            "Military", "PMA", "Easter", "College", "EC", "Ateneo", "UP", "AdMU",
+            "Manila", "Salle", "DLSU", "FEU", "Eastern", "Polytechnic", "Angel",
+            "HAU", "TSU", "AUF", "NEUST", "Nueva", "Philippines", "UPLB", "BatSU",
+            "CvSU", "Cavite", "Batangas", "Benguet", "BSU", "Cebu", "Ateneo", "AdDU",
+            "Mindanao", "Ifugao", "Kalinga", "Abra", "IFSU", "KSU", "ASIST", "Harvard",
+            "Mountain", "MPSPC", "Apayao"
+        ],
+        "food": [
+            "recipe", "cook", "food", "dish", "meal", "restaurant", "adobo", "sinigang",
+            "burger", "pizza", "menu", "eat", "dining", "breakfast", "lunch", "dinner",
+            "snack", "cuisine", "taste", "flavor", "ingredients"
+        ],
+        "entertainment": [
+            "movie", "game", "play", "watch", "stream", "show", "film", "series",
+            "theater", "concert", "music", "dance", "sports", "netflix", "youtube",
+            "television", "tv", "channel", "anime", "drama"
+        ],
+        "weather": [
+            "weather", "rain", "sunny", "forecast", "temperature", "climate", "storm",
+            "typhoon", "humidity", "cloudy", "wind", "precipitation", "flood", "hot",
+            "cold", "weather forecast", "umbrella"
+        ],
+        "shopping": [
+            "buy", "shop", "store", "mall", "price", "discount", "sale", "retail",
+            "purchase", "product", "item", "cart", "checkout", "shopping cart",
+            "marketplace", "seller", "buyer", "brand", "shopping center"
+        ],
+        "social_media": [
+            "twitter", "instagram", "tiktok", "snapchat",
+            "like", "share", "follow", "trending", "viral", "social media",
+            "followers", "friends", "status", "profile", "timeline"
+        ],
+        "superheroes": [
+            "batman", "superman", "spiderman", "ironman", "hulk", "captain america",
+            "thor", "wonder woman", "flash", "aquaman", "black panther", "doctor strange",
+            "green lantern", "cyborg", "joker", "lex luthor", "catwoman", "deadpool"
+        ]
+    }
+}

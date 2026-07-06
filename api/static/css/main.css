@@ -1,0 +1,198 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+#sidebar {
+    background-color: #0d264a;
+    min-height: 100vh;
+    color: white;
+    position: fixed;
+    width: 260px;
+    padding-top: 10px;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+#sidebar.closed {
+    transform: translateX(-100%);
+}
+
+#sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#sidebar ul li {
+    padding: 15px 20px;
+}
+
+#sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    transition: background 0.3s ease;
+}
+
+#sidebar ul li a:hover,
+#sidebar ul li a.active {
+    background-color: #1b3e75;
+    text-decoration: none;
+}
+
+/* Sidebar Toggle Button */
+#sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background-color: #022d5a;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+/* Header Styling */
+#header {
+    background: #0d264a;
+    color: white;
+    padding: 15px;
+    margin-left: 260px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+#header img {
+    height: 40px;
+}
+
+#logo-text {
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+#logo-text span {
+    color: #ffa500;
+}
+
+.user-info {
+    font-weight: bold;
+    color: #dfa609;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    margin-right: 15px;
+}
+
+.user-info a {
+    color: white;
+    text-decoration: none;
+    font-weight: normal;
+    margin-left: 5px;
+}
+
+.user-info a:hover {
+    color: #ffa500;
+}
+
+.mr-3 {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;   /* This makes the background circular */
+    background-color: #f0f0f0;  /* Set a background color for the circle */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mr-3 img {
+    height: 40px;  /* Adjust the image size inside the circle */
+    width: 40px;   /* Adjust the image size inside the circle */
+    border-radius: 50%;  /* Ensure the image is circular */
+}
+
+/* Content Styling */
+#content {
+    padding: 30px;
+    margin-left: 260px;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+#events-announcements,
+#student-status {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #bcbcbc;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+/* Footer Styling */
+footer {
+    margin-left: 260px;
+    background-color: #f8f8f8;
+    padding: 15px;
+    text-align: center;
+    border-top: 1px solid #bcbcbc;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Responsive */
+@media only screen and (max-width: 768px) {
+    #sidebar {
+        width: 0;
+        padding-top: 10px;
+        transform: translateX(-100%);
+    }
+
+    #sidebar.open {
+        transform: translateX(0);
+        width: 200px;
+    }
+
+    #sidebar-toggle {
+        display: block;
+    }
+
+    #header {
+        margin-left: 0;
+        padding: 10px;
+    }
+
+    #content {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    footer {
+        margin-left: 0;
+        padding: 10px;
+    }
+
+    #sidebar ul li a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 5px;
+    }
+
+    #sidebar ul li a span {
+        display: none;
+    }
+}

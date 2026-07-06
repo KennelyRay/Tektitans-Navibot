@@ -10,7 +10,23 @@ from flask import Flask, Response, render_template, request, send_from_directory
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "Data"
+API_DIR = BASE_DIR / "api"
+
+
+def resolve_runtime_dir(directory_name):
+    candidates = [
+        BASE_DIR / directory_name,
+        API_DIR / directory_name,
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
+DATA_DIR = resolve_runtime_dir("Data")
+TEMPLATES_DIR = resolve_runtime_dir("templates")
+STATIC_DIR = resolve_runtime_dir("static")
 FINE_TUNED_BART_DIR = BASE_DIR / "output" / "fine-tuned-bart"
 IS_VERCEL = bool(os.environ.get("VERCEL")) or bool(os.environ.get("VERCEL_ENV"))
 ENABLE_SEMANTIC_MODELS = os.environ.get("ENABLE_SEMANTIC_MODELS", "").lower() in {"1", "true", "yes"} and not IS_VERCEL
@@ -28,8 +44,8 @@ STOP_WORDS = {
 
 app = Flask(
     __name__,
-    template_folder=str(BASE_DIR / "templates"),
-    static_folder=str(BASE_DIR / "static"),
+    template_folder=str(TEMPLATES_DIR),
+    static_folder=str(STATIC_DIR),
 )
 
 
