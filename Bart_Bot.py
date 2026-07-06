@@ -52,6 +52,41 @@ def get_env_int(name, default):
 GEMINI_MAX_CONTEXT_ITEMS = get_env_int("GEMINI_MAX_CONTEXT_ITEMS", 3)
 GEMINI_MAX_TOKENS = get_env_int("GEMINI_MAX_TOKENS", 300)
 
+
+def _debug_report(hypothesis_id, location, msg, data=None, run_id="pre"):
+    try:
+        import urllib.request
+
+        event_url = "http://127.0.0.1:7777/event"
+        session_id = "navibot-wrong-answers"
+        env_path = BASE_DIR / ".dbg" / "navibot-wrong-answers.env"
+        if env_path.exists():
+            env_text = env_path.read_text(encoding="utf-8")
+            for line in env_text.splitlines():
+                if line.startswith("DEBUG_SERVER_URL="):
+                    event_url = line.split("=", 1)[1].strip() or event_url
+                elif line.startswith("DEBUG_SESSION_ID="):
+                    session_id = line.split("=", 1)[1].strip() or session_id
+        payload = {
+            "sessionId": session_id,
+            "runId": run_id,
+            "hypothesisId": hypothesis_id,
+            "location": location,
+            "msg": msg,
+            "data": data or {},
+            "ts": int(time.time() * 1000),
+        }
+        urllib.request.urlopen(
+            urllib.request.Request(
+                event_url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+            ),
+            timeout=1,
+        ).read()
+    except Exception:
+        pass
+
 app = Flask(
     __name__,
     template_folder=str(TEMPLATES_DIR),
@@ -76,7 +111,6 @@ STATIC_QA, enrollment_topics, NON_ACADEMIC_CONTEXTS = load_config()
 static_questions = list(STATIC_QA.keys())
 FAQ_VARIANTS = {
     "Where is the enrollment venue for irregular students?": [
-        "where is the enrollment venue",
         "where is the venue for irregular students",
         "where do irregular students enroll",
         "where can irregular students enroll",
@@ -95,6 +129,12 @@ FAQ_VARIANTS = {
         "where is enrollment",
         "where is the enrollment venue",
         "where should i enroll",
+    ],
+    "How do I start the enrollment process?": [
+        "how do i enroll",
+        "how can i enroll",
+        "how do i start enrollment",
+        "how can i start enrollment",
     ],
     "Can I enroll online or onsite?": [
         "can i enroll online",
@@ -193,11 +233,17 @@ def preprocess_query(query):
 
 def parse_history_param(raw_history):
     if not raw_history:
+        # #region debug-point C:history-empty
+        _debug_report("C", "Bart_Bot.py:parse_history_param", "[DEBUG] History payload missing or empty", {"raw_history_present": False})
+        # #endregion
         return []
 
     try:
         parsed = json.loads(raw_history)
     except json.JSONDecodeError:
+        # #region debug-point C:history-invalid
+        _debug_report("C", "Bart_Bot.py:parse_history_param", "[DEBUG] History payload is not valid JSON", {"raw_history_excerpt": raw_history[:120]})
+        # #endregion
         return []
 
     if not isinstance(parsed, list):
@@ -211,6 +257,9 @@ def parse_history_param(raw_history):
         text = str(item.get("text", "")).strip()
         if role in {"user", "bot"} and text:
             history.append({"role": role, "text": text})
+    # #region debug-point C:history-parsed
+    _debug_report("C", "Bart_Bot.py:parse_history_param", "[DEBUG] History payload parsed", {"history_count": len(history), "last_role": history[-1]["role"] if history else None, "last_text": history[-1]["text"][:120] if history else None})
+    # #endregion
     return history
 
 
@@ -234,6 +283,9 @@ def is_follow_up_query(query):
 
 def resolve_follow_up_query(query, history):
     if not history:
+        # #region debug-point A:followup-no-history
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolution skipped because no history was available", {"query": query[:120]})
+        # #endregion
         return query
 
     lowered_query = query.lower().strip()
@@ -245,52 +297,115 @@ def resolve_follow_up_query(query, history):
             break
 
     if current_topic == "prerequisite":
+        # #region debug-point A:followup-current-prerequisite
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from current topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where can I find the prerequisite of a subject?"})
+        # #endregion
         return "Where can I find the prerequisite of a subject?"
     if current_topic == "available_subjects":
+        # #region debug-point A:followup-current-subjects
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from current topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where can I find available subjects?"})
+        # #endregion
         return "Where can I find available subjects?"
     if current_topic == "payment":
+        # #region debug-point A:followup-current-payment
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from current topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "What payment methods are available?"})
+        # #endregion
         return "What payment methods are available?"
     if current_topic == "enrollment_mode":
         if "regular" in lowered_query:
+            # #region debug-point A:followup-current-mode-regular
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from enrollment mode topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do regular students enroll?"})
+            # #endregion
             return "Where do regular students enroll?"
         if "irregular" in lowered_query:
+            # #region debug-point A:followup-current-mode-irregular
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from enrollment mode topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do irregular students enroll?"})
+            # #endregion
             return "Where do irregular students enroll?"
+        # #region debug-point A:followup-current-mode
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from enrollment mode topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Can I enroll online or onsite?"})
+        # #endregion
         return "Can I enroll online or onsite?"
     if current_topic == "enrollment_venue" and "regular" in lowered_query:
+        # #region debug-point A:followup-current-venue-regular
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from enrollment venue topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do regular students enroll?"})
+        # #endregion
         return "Where do regular students enroll?"
     if current_topic == "enrollment_venue" and "irregular" in lowered_query:
+        # #region debug-point A:followup-current-venue-irregular
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from enrollment venue topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do irregular students enroll?"})
+        # #endregion
         return "Where do irregular students enroll?"
 
     if not previous_topic or not is_follow_up_query(query):
+        # #region debug-point A:followup-no-rewrite
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolution left query unchanged", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "is_follow_up": is_follow_up_query(query)})
+        # #endregion
         return query
 
     if previous_topic == "enrollment_venue":
         if "regular" in lowered_query:
+            # #region debug-point A:followup-previous-venue-regular
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous enrollment venue topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do regular students enroll?"})
+            # #endregion
             return "Where do regular students enroll?"
         if "irregular" in lowered_query:
+            # #region debug-point A:followup-previous-venue-irregular
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous enrollment venue topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do irregular students enroll?"})
+            # #endregion
             return "Where do irregular students enroll?"
         if any(keyword in lowered_query for keyword in ("online", "onsite", "in person", "portal")):
+            # #region debug-point A:followup-previous-venue-mode
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous enrollment venue topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Can I enroll online or onsite?"})
+            # #endregion
             return "Can I enroll online or onsite?"
+        # #region debug-point A:followup-previous-venue
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous enrollment venue topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "What is the enrollment venue for regular and irregular students?"})
+        # #endregion
         return "What is the enrollment venue for regular and irregular students?"
 
     if previous_topic == "available_subjects":
         if any(keyword in lowered_query for keyword in ("prerequisite", "prerequisites", "prereq")):
+            # #region debug-point A:followup-previous-subjects-prereq
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous available-subjects topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where can I find the prerequisite of a subject?"})
+            # #endregion
             return "Where can I find the prerequisite of a subject?"
+        # #region debug-point A:followup-previous-subjects
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous available-subjects topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where can I find available subjects?"})
+        # #endregion
         return "Where can I find available subjects?"
 
     if previous_topic == "prerequisite":
+        # #region debug-point A:followup-previous-prereq
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous prerequisite topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where can I find the prerequisite of a subject?"})
+        # #endregion
         return "Where can I find the prerequisite of a subject?"
 
     if previous_topic == "payment":
+        # #region debug-point A:followup-previous-payment
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous payment topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "What payment methods are available?"})
+        # #endregion
         return "What payment methods are available?"
 
     if previous_topic == "enrollment_mode":
         if "regular" in lowered_query:
+            # #region debug-point A:followup-previous-mode-regular
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous enrollment-mode topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do regular students enroll?"})
+            # #endregion
             return "Where do regular students enroll?"
         if "irregular" in lowered_query:
+            # #region debug-point A:followup-previous-mode-irregular
+            _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous enrollment-mode topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do irregular students enroll?"})
+            # #endregion
             return "Where do irregular students enroll?"
+        # #region debug-point A:followup-previous-mode
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from previous enrollment-mode topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Can I enroll online or onsite?"})
+        # #endregion
         return "Can I enroll online or onsite?"
 
+    # #region debug-point A:followup-fallthrough
+    _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolution fell through without rewrite", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic})
+    # #endregion
     return query
 
 
@@ -423,7 +538,9 @@ def question_similarity_score(query, query_tokens, question):
     normalized_query = query.lower().strip()
     for candidate in candidates:
         candidate_tokens = set(tokenize_text(candidate)) - STOP_WORDS
-        overlap_score = len(query_tokens & candidate_tokens) / max(len(candidate_tokens), 1)
+        overlap_score = 0.0
+        if len(query_tokens) >= 2 and len(candidate_tokens) >= 2:
+            overlap_score = len(query_tokens & candidate_tokens) / max(len(candidate_tokens), 1)
         sequence_score = SequenceMatcher(None, normalized_query, candidate).ratio()
         substring_score = 1.0 if normalized_query in candidate or candidate in normalized_query else 0.0
         best_score = max(best_score, overlap_score, sequence_score, substring_score)
@@ -528,6 +645,9 @@ def find_static_answer(query, similarity_threshold=0.7):
         exact_candidates = [question.lower().strip()]
         exact_candidates.extend(variant.lower().strip() for variant in FAQ_VARIANTS.get(question, []))
         if query_lower in exact_candidates:
+            # #region debug-point B:static-exact-match
+            _debug_report("B", "Bart_Bot.py:find_static_answer", "[DEBUG] Static FAQ exact match selected", {"query": query[:120], "matched_question": question, "score": 1.0, "threshold": similarity_threshold})
+            # #endregion
             return {
                 "found": True,
                 "answer": STATIC_QA[question],
@@ -537,6 +657,9 @@ def find_static_answer(query, similarity_threshold=0.7):
 
     best_question, best_score = best_static_question_score(query, query_tokens)
     if best_question and best_score >= similarity_threshold:
+        # #region debug-point B:static-best-match
+        _debug_report("B", "Bart_Bot.py:find_static_answer", "[DEBUG] Static FAQ best match selected", {"query": query[:120], "matched_question": best_question, "score": round(best_score, 4), "threshold": similarity_threshold})
+        # #endregion
         return {
             "found": True,
             "answer": STATIC_QA[best_question],
@@ -552,6 +675,9 @@ def find_static_answer(query, similarity_threshold=0.7):
         best_match_score = cosine_scores[0][best_match_idx].item()
 
         if best_match_score >= similarity_threshold:
+            # #region debug-point B:static-semantic-match
+            _debug_report("B", "Bart_Bot.py:find_static_answer", "[DEBUG] Semantic FAQ match selected", {"query": query[:120], "matched_question": static_questions[best_match_idx], "score": round(best_match_score, 4), "threshold": similarity_threshold})
+            # #endregion
             return {
                 "found": True,
                 "answer": STATIC_QA[static_questions[best_match_idx]],
@@ -560,6 +686,9 @@ def find_static_answer(query, similarity_threshold=0.7):
             }
         best_score = max(best_score, best_match_score)
 
+    # #region debug-point B:static-no-match
+    _debug_report("B", "Bart_Bot.py:find_static_answer", "[DEBUG] No static FAQ match found", {"query": query[:120], "best_score": round(best_score, 4), "threshold": similarity_threshold})
+    # #endregion
     return {
         "found": False,
         "score": best_score,
@@ -570,6 +699,9 @@ def process_query(query):
     """Check relevancy, then static answers, then optional text generation."""
     relevancy_result = check_relevancy(query, threshold=0.5)
     if not relevancy_result["is_relevant"]:
+        # #region debug-point D:process-not-relevant
+        _debug_report("D", "Bart_Bot.py:process_query", "[DEBUG] Query rejected by relevancy guard", {"query": query[:120], "reason": relevancy_result.get("reason"), "confidence_score": relevancy_result.get("confidence_score")})
+        # #endregion
         message = "I can only help with enrollment-related questions. "
         if "non-academic" in relevancy_result.get("reason", ""):
             message += f"Your question appears to contain {relevancy_result['reason']}."
@@ -582,11 +714,17 @@ def process_query(query):
 
     static_result = find_static_answer(query)
     if static_result["found"]:
+        # #region debug-point D:process-static-answer
+        _debug_report("D", "Bart_Bot.py:process_query", "[DEBUG] Query answered by static FAQ", {"query": query[:120], "matched_question": static_result.get("matched_question"), "score": static_result.get("score")})
+        # #endregion
         return {
             "status": "static_answer",
             "message": static_result["answer"],
         }
 
+    # #region debug-point D:process-use-generation
+    _debug_report("D", "Bart_Bot.py:process_query", "[DEBUG] Query routed to generation", {"query": query[:120], "relevancy_score": relevancy_result.get("confidence_score"), "matched_topics": sorted(relevancy_result.get("matched_topics", []))[:5]})
+    # #endregion
     return {
         "status": "use_generation",
         "message": None,
@@ -734,6 +872,9 @@ def extract_gemini_chunk_text(chunk):
 def stream_gemini_response(prompt):
     genai = get_llm_client()
     if not genai:
+        # #region debug-point E:gemini-missing-key
+        _debug_report("E", "Bart_Bot.py:stream_gemini_response", "[DEBUG] Gemini generation skipped because API key is missing", {"prompt": prompt[:120], "gemini_model": GEMINI_MODEL})
+        # #endregion
         yield build_meta_event(
             source="fallback",
             reason="missing_gemini_key",
@@ -755,6 +896,9 @@ def stream_gemini_response(prompt):
     faq_context = build_context_block(prompt)
 
     try:
+        # #region debug-point E:gemini-start
+        _debug_report("E", "Bart_Bot.py:stream_gemini_response", "[DEBUG] Gemini generation started", {"prompt": prompt[:120], "gemini_model": GEMINI_MODEL, "context_excerpt": faq_context[:180]})
+        # #endregion
         model = genai.GenerativeModel(
             model_name=GEMINI_MODEL,
             system_instruction=system_prompt,
@@ -787,6 +931,9 @@ def stream_gemini_response(prompt):
             accumulated_response += delta
             yield format_response(accumulated_response)
     except Exception as exc:
+        # #region debug-point E:gemini-error
+        _debug_report("E", "Bart_Bot.py:stream_gemini_response", "[DEBUG] Gemini generation failed", {"prompt": prompt[:120], "gemini_model": GEMINI_MODEL, "error": str(exc)[:200]})
+        # #endregion
         yield build_meta_event(
             source="fallback",
             reason="gemini_error",
@@ -866,6 +1013,10 @@ def chat_stream():
     if not user_input:
         return Response("No message provided.", status=400)
 
+    # #region debug-point C:chat-stream-request
+    _debug_report("C", "Bart_Bot.py:chat_stream", "[DEBUG] Chat request received", {"user_input": user_input[:120], "history_count": len(history), "history_tail": history[-2:]})
+    # #endregion
+
     def generate():
         try:
             if contains_multiple_questions(user_input):
@@ -875,6 +1026,9 @@ def chat_stream():
                 return
 
             resolved_input = resolve_follow_up_query(user_input, history)
+            # #region debug-point A:chat-stream-resolved
+            _debug_report("A", "Bart_Bot.py:chat_stream", "[DEBUG] Chat request resolved before processing", {"user_input": user_input[:120], "resolved_input": resolved_input[:120], "history_count": len(history)})
+            # #endregion
             result = process_query(resolved_input)
             if user_input.lower() == "thank you":
                 thanks = format_response("No worries! Happy to help!")
