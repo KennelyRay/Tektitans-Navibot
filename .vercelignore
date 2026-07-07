@@ -11,3 +11,8 @@ BertScore_Bart.py
 Trainer_Bart.py
 __pycache__
 *.ipynb
+node_modules
+frontend
+package.json
+package-lock.json
+build.mjs

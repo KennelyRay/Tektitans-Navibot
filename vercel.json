@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
+  "installCommand": "echo \"Skipping npm install: the React frontend bundle is pre-built and committed (see README) - this deploy is Python-only.\"",
+  "buildCommand": "echo \"No build step: Python function only, nothing to build at deploy time.\"",
   "functions": {
     "api/index.py": {
       "includeFiles": "**/*"

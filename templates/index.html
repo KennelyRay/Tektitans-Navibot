@@ -4,7 +4,6 @@
  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iSLU Student Portal</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Third-Party CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -12,15 +11,11 @@
     <link rel="stylesheet" type="text/css" href="../static/css/main.css">
     <link rel="stylesheet" type="text/css" href="../static/css/chatbot.css">
 
-    <!-- First load all third-party libraries -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <!-- Navibot chat widget: a single pre-built bundle (React + ChatWidget +
+         StaticQuestionsCarousel). Rebuild with `npm run build` after editing
+         anything under frontend/src, then commit the regenerated bundle. -->
+    <script src="../static/js/navibot.bundle.js" defer></script>
 
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-    <script src="{{ url_for('static', filename='js/StaticQuestionsCarousel.js') }}"></script>
-    <script src="../static/js/script.js"></script>
     <!-- Dynamic Path Adjuster -->
    <script>
     (function adjustPaths() {
@@ -52,10 +47,6 @@
         });
     })();
 </script>
-
-
-
-
 
 </head>
 <body>
@@ -160,58 +151,15 @@
         Copyright &copy; 2026 <strong>Saint Louis University Inc.</strong> All rights reserved.
     </footer>
 
-<!-- Chat Interface -->
-<div id="chat-bubble" aria-label="Open Navibot chat" role="button" tabindex="0">
-    <span class="chat-bubble-ring"></span>
-    <img src="../static/images/chatbot_icon.png" alt="Robot Icon"/>
-    <span class="chat-bubble-status"></span>
-</div>
+    <!-- Navibot chat widget mounts here (see frontend/src/main.jsx) -->
+    <div id="navibot-root"></div>
 
-<div id="chat-container">
-    <div id="chat-header">
-        <div class="chat-header-profile">
-            <div class="chat-header-avatar">
-                <img src="../static/images/chatbot_icon.png" alt="Robot Icon"/>
-            </div>
-            <div class="chat-header-copy">
-                <span class="chat-header-title">Navibot</span>
-                <span class="chat-header-subtitle">Enrollment Assistant</span>
-            </div>
-        </div>
-        <div class="chat-header-actions">
-            <div class="chat-help">
-                <button id="help-btn" type="button" aria-label="Show Navibot disclaimer">?</button>
-                <div class="chat-help-tooltip" role="tooltip">
-                    Please note: Navibot is designed to help with enrollment FAQs, the information provided may not always be fully accurate or up-to-date. For important details, please verify with official school resources.
-                </div>
-            </div>
-            <button id="close-btn">&times;</button>
-        </div>
-    </div>
-
-    <div id="chat-box">
-        <div class="message-container bot intro-message">
-            <div class="avatar"></div>
-            <div class="message bot intro-card">
-                <div class="intro-badge">Online</div>
-                <div class="message-content">
-                    <p>Hello! I’m Navibot.</p>
-                    <p>I can help with enrollment questions, schedules, requirements, and other student portal guidance.</p>
-                </div>
-                <div class="message-meta">Ask a question or tap a suggested prompt below.</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="static-questions">
-    </div>
-
-    <div id="input-container">
-        <input type="text" id="user-input" placeholder="Type your message...">
-        <button id="send-btn">Send</button>
-    </div>
-</div>
-
-
+    <script>
+        // Portal chrome only (mobile sidebar toggle) - unrelated to Navibot,
+        // kept as plain JS so the page has no jQuery dependency anymore.
+        document.getElementById('sidebar-toggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+    </script>
 </body>
 </html>

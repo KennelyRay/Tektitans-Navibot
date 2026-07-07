@@ -1,0 +1,17 @@
+{
+  "name": "navibot-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "React/JSX build for the Navibot chat widget and suggested-prompts carousel. Flask keeps serving the app and the /chat-stream API untouched; this only builds the client-side bundle.",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

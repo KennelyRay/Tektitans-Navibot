@@ -1,6 +1,31 @@
 # Tektitans-Navibot
 This repository is made to develop a Generative AI Chatbot that answers enrollment related questions for SAMCIS students specially for BSIT and BSCS. 
 
+## Frontend build (React/JSX)
+
+The chat widget and the suggested-prompts row are a small React app (`frontend/src/`), bundled with esbuild into a single static file. The Flask backend and the `/chat-stream` API are untouched by this — it only affects the client-side UI.
+
+- `frontend/src/ChatWidget.jsx` — the chat bubble, message list, SSE streaming, history tracking (ported from the old jQuery `script.js`).
+- `frontend/src/StaticQuestionsCarousel.jsx` — the suggested-prompts chip row.
+- `frontend/src/main.jsx` — mounts `ChatWidget` into `<div id="navibot-root">` in `templates/index.html`.
+
+To build after changing anything under `frontend/src/`:
+
+```
+npm install   # first time only
+npm run build
+```
+
+This writes `static/js/navibot.bundle.js` and copies it to `api/static/js/navibot.bundle.js` automatically. **Vercel's deploy here is Python-only** (see below) — there is no Node build step in `vercel.json`, so the bundle is a committed build artifact, not something generated at deploy time. Always run `npm run build` and commit the regenerated bundle before deploying frontend changes. `npm run watch` rebuilds on save for local iteration.
+
+### Why `vercel.json` explicitly disables install/build
+
+Adding a root-level `package.json` makes Vercel's zero-config detection *want* to run `npm install` (and possibly `npm run build`) automatically during deploy. That's a real problem for this project: the Python function is configured with `includeFiles: "**/*"`, which bundles everything in the working directory at build time — if `npm install` ran first, the freshly created `node_modules/` (react, react-dom, esbuild's native binary, etc.) would get scooped into the Python serverless function bundle and could blow past Vercel's function size limit and crash the deploy, the same class of problem documented in past debug sessions.
+
+To prevent that, `vercel.json` sets `installCommand` and `buildCommand` to harmless no-op `echo` commands, so Vercel never runs `npm install` at all — nothing needs building at deploy time since the bundle is already committed. `node_modules/`, `frontend/`, `package.json`, `package-lock.json`, and `build.mjs` are also excluded via `.vercelignore` as a second layer of protection.
+
+If your Vercel project's dashboard (Project Settings → Build & Development Settings) has an **Install Command** or **Build Command** override toggled on, that dashboard setting takes precedence over `vercel.json` — check that both are switched off (or left on their defaults) so the `vercel.json` values actually apply.
+
 ## Deploying on Vercel
 
 This repo is now configured to deploy as a Python serverless app on Vercel.
