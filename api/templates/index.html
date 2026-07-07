@@ -59,113 +59,105 @@
 
 </head>
 <body>
-    <div id="sidebar-toggle">
-        <i class="fas fa-bars"></i>
-    </div>
-    <div id="sidebar">
-        <div class="text-center py-3">
-            <img src="../static/images/image.png" alt="Logo" style="height: 40px;">
+    <div id="topbar">
+        <div id="topbar-brand">
+            <img src="../static/images/image.png" alt="Logo">
             <div id="logo-text">STUDENT <span>portal</span></div>
-            <div class="mt-3">
-                <button class="btn btn-dark btn-block" disabled>FIRST SEMESTER, 2024-2025</button>
-            </div>
         </div>
-        <ul class="nav flex-column">
-            <li class="nav-item"><a href="#" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-calendar"></i> Schedule</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-check-circle"></i> Attendance</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-money-check-alt"></i> Statement of Accounts</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i> Grades</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-file-alt"></i> Transcript of Records</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-check"></i> Curriculum Checklist</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user-md"></i> Medical Record</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-address-card"></i> Personal Details</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-book"></i> Journal/Periodical</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-info-circle"></i> Downloadables / About iSLU</a></li>
-        </ul>
-    </div>
-
-    <div id="header">
-        <div></div>
-        <div class="d-flex align-items-center">
-            <div class="mr-3">
-                <img src="../static/images/user_icon.png" alt="User Photo" class="user-photo">
-            </div>
+        <div id="topbar-user">
+            <img src="../static/images/user_icon.png" alt="User Photo" class="topbar-avatar">
             <div class="user-info">
-                MARIO DI MAGIBA Jr.<br>
+                <div class="user-name">KENNELY RAY S. BUCANG</div>
                 <a href="../logout">Logout</a>
             </div>
         </div>
     </div>
+
+    <div id="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+    </div>
+    <div id="sidebar">
+        <div class="sidebar-term">
+            <button class="btn-term" disabled>SHORT TERM 2026</button>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a href="#" class="nav-link active"><i class="fas fa-home"></i> <span>Home</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-th-large"></i> <span>Schedule</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-clipboard-check"></i> <span>Attendance</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-money-check-alt"></i> <span>Statement of Accounts</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i> <span>Grades</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-file-alt"></i> <span>Transcript of Records</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-check-circle"></i> <span>Curriculum Checklist</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-plus-square"></i> <span>Medical Record</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-address-card"></i> <span>Personal Details</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-book"></i> <span>Journal/Periodical</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-info-circle"></i> <span>Downloadables / About iSLU</span></a></li>
+        </ul>
+    </div>
+
     <div id="content">
         <div class="dashboard-container row">
             <div class="col-md-8">
-                <div id="events-announcements">
-                    <h5><i class="fas fa-newspaper"></i> Events, News & Announcements</h5>
-                    <p>Dear Parents/Guardians, ...</p>
-                    <p>We believe that the growth and success of our Louisian college students are still highly determined by your support and guidance. As such, it is our hope that through this short video, we will be able to provide you the right and necessary information in supervising your children/ward in their transition to adulthood.</p>
-                    <p>"This webpage is created solely to demonstrate what the Chatbot looks like when integrated into the Student Portal. It is for illustrative purposes only and is not intended for use in commercial use or any form of plagiarism."</p>
-                    <p>Your feedback is highly appreciated as this will help us determine how we can improve our program and identify topics we may talk about in the future. You may access both the video and evaluation form link.</p>
-                    <p><a href="#" style="color: #d70000;">- view link</a></p>
-                    <hr>
-                    <p>Dear Louisian,</p>
-                    <p>We know that studying can sometimes feel overwhelming, but it doesn't have to be that way. To help you make the most of your academic experience, we are sharing to you a FREE eBook on Effective Study Methods with practical strategies and tips designed to improve your focus, retention, and overall success.</p>
-                    <p>EFFECTIVE STUDY METHODS FOR ACADEMIC SUCCESS: <a href="https://my.visme.co/view/rx73rxw6-effective-study-methods-ebook" target="_blank" style="color: #d70000;">https://my.visme.co/view/rx73rxw6-effective-study-methods-ebook</a></p>
-                    <p>Please take your time to explore the material, and feel free to share it with your fellow students. We are here to support you, so don't hesitate to reach out if you have any questions or need any further guidance. Also, your feedback on this eBook is highly appreciated. Please accomplish our evaluation tool on this link: <a href="https://docs.google.com/forms/d/18x_m7VTqU4ogWfFtDw59yCMKOymUOWIRScdtt3HSzKY/edit" target="_blank" style="color: #d70000;">Evaluation Form</a></p>
-                    <p>We are wishing you all the best on your academic journey! Rooting for your academic success, The Center for Counseling and Wellness</p>
-                    <p><a href="#" style="color: #d70000;">- view link</a></p>
-                    <hr>
-                    <p>Recollection Schedule for 1st years (Freshmen)</p>
-                    <p><a href="#" style="color: #d70000;">- view attachment</a></p>
-                    <hr>
-                    <p>Pertinent Reminders from the Office of Student Affairs</p>
-                    <p><a href="#" style="color: #d70000;">- view attachment</a></p>
-                    <hr>
-                    <p>OSAS Requests for Slips and Certificates for AY 2024-2025</p>
-                    <p><a href="#" style="color: #d70000;">- view attachment</a></p>
-                    <hr>
-                    <p><b><u>ACADEMIC CALENDAR 2024-2025</u></b></p>
-                    <p><a href="#" style="color: #d70000;">- view attachment</a></p>
+                <div id="events-announcements" class="panel">
+                    <div class="panel-header"><i class="fas fa-newspaper"></i>Events, News &amp; Announcements</div>
+                    <div class="panel-body">
+                        <div class="season-badge">
+                            <span class="season-badge-script">Short Term</span>
+                            <span class="season-badge-year">2026</span>
+                        </div>
+                        <p><strong>REMINDER:</strong> All students are requested to answer the AppliedHE Public &amp; Private University Ranking: ALL ASIA &amp; ASEAN 2027 Student Survey on or before 15 July 2026.</p>
+                        <p>Please check your email (including spam folder) for the survey invitation, or access it directly through the link. If you have already started the survey, kindly make sure to complete and submit your responses, as only completed surveys are counted. Thank you!</p>
+                        <p><a href="#" class="view-link">- view link</a></p>
+                        <hr>
+                        <p><strong>SPREAD KINDNESS CAMPAIGN</strong></p>
+                        <p><a href="#" class="view-link">- view attachment</a></p>
+                        <hr>
+                        <p><strong>Short Term, 2026 Examination Schedules</strong></p>
+                        <p><a href="#" class="view-link">- view link</a></p>
+                        <hr>
+                        <p><strong>Recollection for Incoming Freshmen 2026-27</strong></p>
+                        <p><a href="#" class="view-link">- view link</a></p>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div id="student-status">
-                    <h5><i class="fas fa-pushpin"></i> Student Status</h5>
-                    <p class="status-title">Status:</p>
-                    <p>- <span style="color:darkblue;">CURRENTLY ENROLLED THIS FIRST SEMESTER, 2024-2025 IN BSIT 4.</span></p>
-                    <h5>Dean's List:</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Semester</th>
-                                <th>Course & Year</th>
-                                <th>Average</th>
-                                <th>Rank</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>FIRST SEMESTER, 2021-2022</td>
-                                <td>BSIT 1</td>
-                                <td>99</td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td>SECOND SEMESTER, 2021-2022</td>
-                                <td>BSIT 1</td>
-                                <td>99</td>
-                                <td>1</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div id="student-status" class="panel">
+                    <div class="panel-header"><i class="fas fa-thumbtack"></i>Student Status</div>
+                    <div class="panel-body">
+                        <p class="status-title">Status:</p>
+                        <p class="status-value">- LAST ENROLLED: SECOND SEMESTER, 2025-2026 IN BSIT 4.</p>
+                        <h3 class="deans-list-title">Dean's List:</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>Course&amp;Year</th>
+                                    <th>Average</th>
+                                    <th>Rank</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>FIRST SEMESTER, 2021-2022</td>
+                                    <td>BSIT 1</td>
+                                    <td>88.4782</td>
+                                    <td>912</td>
+                                </tr>
+                                <tr>
+                                    <td>SECOND SEMESTER, 2021-2022</td>
+                                    <td>BSIT 1</td>
+                                    <td>88.0869</td>
+                                    <td>710</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <footer>
-        Copyright &copy; 2021
-        <strong>TMDD - Software Development.</strong>
-        All rights reserved.
+        Copyright &copy; 2026 <strong>Saint Louis University Inc.</strong> All rights reserved.
     </footer>
 
 <!-- Chat Interface -->

@@ -1,25 +1,153 @@
+:root {
+    --portal-navy: #0d264a;
+    --portal-navy-deep: #081a33;
+    --portal-gold: #f2b134;
+    --portal-accent-line: linear-gradient(90deg, #1c3f70 0%, #57c7e3 50%, #1c3f70 100%);
+    --portal-green: #2e6b2f;
+    --portal-link: #c1571f;
+    --portal-border: #d9dee6;
+}
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+    background-color: #eef1f5;
     margin: 0;
     padding: 0;
     color: #333;
 }
 
-#sidebar {
-    background-color: #0d264a;
-    min-height: 100vh;
-    color: white;
+/* Top bar: full-width, fixed, sits above both the sidebar and the content */
+#topbar {
     position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--portal-navy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1100;
+    border-bottom: 3px solid transparent;
+    border-image: var(--portal-accent-line) 1;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+#topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#topbar-brand img {
+    height: 34px;
+}
+
+#logo-text {
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    letter-spacing: 0.02em;
+}
+
+#logo-text span {
+    color: var(--portal-gold);
+    font-style: italic;
+    font-weight: 700;
+}
+
+#topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.topbar-avatar {
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    object-fit: cover;
+}
+
+.user-info {
+    text-align: right;
+    line-height: 1.3;
+}
+
+.user-info .user-name {
+    font-weight: bold;
+    font-size: 13px;
+    color: var(--portal-gold);
+    letter-spacing: 0.02em;
+}
+
+.user-info a {
+    color: white;
+    text-decoration: none;
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.user-info a:hover {
+    color: var(--portal-gold);
+}
+
+/* Sidebar toggle (mobile only) */
+#sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 13px;
+    left: 15px;
+    background-color: var(--portal-navy-deep);
+    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 38px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1200;
+}
+
+/* Sidebar: starts below the top bar */
+#sidebar {
+    background-color: var(--portal-navy);
+    position: fixed;
+    top: 64px;
+    left: 0;
     width: 260px;
-    padding-top: 10px;
+    height: calc(100vh - 64px);
+    color: white;
+    padding-top: 14px;
     z-index: 1000;
+    overflow-y: auto;
     transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
-    overflow: hidden;
 }
 
 #sidebar.closed {
     transform: translateX(-100%);
+}
+
+.sidebar-term {
+    padding: 0 16px 14px;
+}
+
+.btn-term {
+    width: 100%;
+    display: block;
+    background-color: #ffffff;
+    color: var(--portal-navy);
+    border: 0;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    cursor: default;
 }
 
 #sidebar ul {
@@ -29,155 +157,186 @@ body {
 }
 
 #sidebar ul li {
-    padding: 15px 20px;
+    padding: 0;
 }
 
 #sidebar ul li a {
-    color: white;
+    color: rgba(255, 255, 255, 0.88);
     text-decoration: none;
-    display: block;
-    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 20px;
+    font-size: 14px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+#sidebar ul li a i {
+    width: 18px;
+    text-align: center;
 }
 
 #sidebar ul li a:hover,
 #sidebar ul li a.active {
-    background-color: #1b3e75;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--portal-gold);
     text-decoration: none;
 }
 
-/* Sidebar Toggle Button */
-#sidebar-toggle {
-    display: none;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    background-color: #022d5a;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 40px;
-    font-size: 24px;
-    cursor: pointer;
-    z-index: 1100;
-}
-
-/* Header Styling */
-#header {
-    background: #0d264a;
-    color: white;
-    padding: 15px;
-    margin-left: 260px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    transition: margin-left 0.3s ease-in-out;
-}
-
-#header img {
-    height: 40px;
-}
-
-#logo-text {
-    font-family: 'Trebuchet MS', sans-serif;
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
-}
-
-#logo-text span {
-    color: #ffa500;
-}
-
-.user-info {
-    font-weight: bold;
-    color: #dfa609;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    margin-right: 15px;
-}
-
-.user-info a {
-    color: white;
-    text-decoration: none;
-    font-weight: normal;
-    margin-left: 5px;
-}
-
-.user-info a:hover {
-    color: #ffa500;
-}
-
-.mr-3 {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;   /* This makes the background circular */
-    background-color: #f0f0f0;  /* Set a background color for the circle */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.mr-3 img {
-    height: 40px;  /* Adjust the image size inside the circle */
-    width: 40px;   /* Adjust the image size inside the circle */
-    border-radius: 50%;  /* Ensure the image is circular */
-}
-
-/* Content Styling */
+/* Content area */
 #content {
-    padding: 30px;
+    padding: 26px 30px;
     margin-left: 260px;
+    margin-top: 64px;
     transition: margin-left 0.3s ease-in-out;
 }
 
-#events-announcements,
-#student-status {
+.panel {
     background-color: white;
-    padding: 20px;
-    border: 1px solid #bcbcbc;
+    border: 1px solid var(--portal-border);
+    border-radius: 6px;
     margin-bottom: 20px;
-    border-radius: 8px;
+    overflow: hidden;
 }
 
-/* Footer Styling */
+.panel-header {
+    background: var(--portal-navy);
+    color: var(--portal-gold);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 16px;
+}
+
+.panel-header i {
+    margin-right: 8px;
+}
+
+.panel-body {
+    position: relative;
+    padding: 20px;
+}
+
+.panel-body p {
+    margin: 0 0 10px;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.panel-body hr {
+    border: none;
+    border-top: 1px dashed #c7cdd6;
+    margin: 12px 0;
+}
+
+.view-link {
+    color: var(--portal-link);
+    font-style: italic;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.view-link:hover {
+    text-decoration: underline;
+}
+
+.season-badge {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    text-align: right;
+    line-height: 1;
+}
+
+.season-badge .season-badge-script {
+    display: block;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 28px;
+    color: #2e8b57;
+}
+
+.season-badge .season-badge-year {
+    display: block;
+    font-size: 26px;
+    font-weight: 800;
+    color: #14213d;
+    margin-top: -4px;
+}
+
+.status-title {
+    font-weight: 700;
+    color: #222;
+}
+
+.status-value {
+    color: var(--portal-green);
+    font-weight: 700;
+}
+
+.deans-list-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 16px 0 10px;
+    color: #222;
+}
+
+.panel-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.panel-body table th,
+.panel-body table td {
+    border: 1px solid var(--portal-border);
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.panel-body table th {
+    background-color: #f4f6f9;
+    font-weight: 700;
+    color: #222;
+}
+
+/* Footer */
 footer {
     margin-left: 260px;
     background-color: #f8f8f8;
     padding: 15px;
     text-align: center;
-    border-top: 1px solid #bcbcbc;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    color: #555;
+    font-size: 13px;
+    border-top: 1px solid var(--portal-border);
     transition: margin-left 0.3s ease-in-out;
 }
 
 /* Responsive */
 @media only screen and (max-width: 768px) {
+    #topbar {
+        padding: 0 14px 0 60px;
+    }
+
+    #logo-text {
+        font-size: 17px;
+    }
+
     #sidebar {
         width: 0;
-        padding-top: 10px;
         transform: translateX(-100%);
     }
 
     #sidebar.open {
         transform: translateX(0);
-        width: 200px;
+        width: 220px;
     }
 
     #sidebar-toggle {
         display: block;
     }
 
-    #header {
-        margin-left: 0;
-        padding: 10px;
-    }
-
     #content {
         margin-left: 0;
-        padding: 15px;
+        padding: 16px;
     }
 
     footer {
@@ -185,14 +344,11 @@ footer {
         padding: 10px;
     }
 
-    #sidebar ul li a {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 5px;
+    #sidebar ul li a span {
+        display: inline;
     }
 
-    #sidebar ul li a span {
+    .season-badge {
         display: none;
     }
 }
