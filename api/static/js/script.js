@@ -92,6 +92,9 @@ $(document).ready(function() {
                 addHistoryEntry('bot', accumulatedData);
                 return;
             }
+            // Swap the typing dots for the reply as soon as the first chunk arrives,
+            // instead of leaving them showing next to text that's already streaming in.
+            $('#chat-box .message.bot').last().find('.typing-indicator-container').remove();
             accumulatedData = event.data.replace(/:\s+/g, ':\n');
             $('#chat-box .message.bot').last().find('.message-content').html(accumulatedData);
             scrollChatToBottom();

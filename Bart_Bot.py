@@ -289,11 +289,36 @@ def contains_multiple_questions(query):
     return question_count >= 2
 
 
-def format_response(response_text):
-    response_text = escape(response_text, quote=False)
+def format_response(response_text, escape_html=True):
+    """Wrap plain text into the chatbot's list/paragraph HTML.
+
+    Static FAQ answers intentionally embed trusted `<a href="mailto:...">`
+    links authored in `static_qa.json`, so they're rendered with
+    escape_html=False. Generated (Groq) text is untrusted and always escaped
+    to avoid rendering injected markup.
+    """
+    if escape_html:
+        response_text = escape(response_text, quote=False)
     formatted_text = "<div class='chatbot-response'>"
     in_numbered_list = False
     in_bullet_list = False
+
+    placeholders = {}
+
+    def stash(html):
+        placeholder_id = f"__HTML_{len(placeholders)}__"
+        placeholders[placeholder_id] = html
+        return placeholder_id
+
+    # Protect any pre-formed <a>...</a> tags (e.g. trusted mailto links from
+    # static_qa.json) before the rules below run, since the colon->br rule
+    # would otherwise break a "mailto:" attribute value across a line.
+    response_text = re.sub(
+        r"<a\b[^>]*>.*?</a>",
+        lambda match: stash(match.group(0)),
+        response_text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
 
     def add_www(match):
         url = match.group(1)
@@ -301,15 +326,8 @@ def format_response(response_text):
             url = re.sub(r"(https?://)", r"\1www.", url)
         return f"<a href='{url}'>{url}</a>"
 
-    urls = {}
     url_pattern = r"(http[s]?://[^\s<]+)"
-
-    def extract_urls(match):
-        url_id = f"__URL_{len(urls)}__"
-        urls[url_id] = add_www(match)
-        return url_id
-
-    response_text = re.sub(url_pattern, extract_urls, response_text)
+    response_text = re.sub(url_pattern, lambda match: stash(add_www(match)), response_text)
 
     def insert_br_outside_url(text):
         pattern = r"(?<!http:)(?<!https:):(?!\d)"
@@ -317,8 +335,8 @@ def format_response(response_text):
 
     response_text = insert_br_outside_url(response_text)
 
-    for url_id, url_html in urls.items():
-        response_text = response_text.replace(url_id, url_html)
+    for placeholder_id, html in placeholders.items():
+        response_text = response_text.replace(placeholder_id, html)
 
     lines = response_text.splitlines()
     for line in lines:
@@ -373,6 +391,35 @@ def build_meta_event(**payload):
     return f"event: meta\ndata: {json.dumps(payload)}\n\n"
 
 
+def reveal_text_progressively(text, words_per_chunk=3, delay=0.03):
+    """Yield the text growing a few words at a time, preserving line breaks.
+
+    Static/guard replies used to appear all at once while Groq answers
+    streamed in, which made the bot feel inconsistent. Revealing every reply
+    the same gradual way makes the whole chat feel live.
+    """
+    lines = text.split("\n")
+    revealed_lines = []
+    for line in lines:
+        words = line.split(" ")
+        for end in range(words_per_chunk, len(words), words_per_chunk):
+            yield "\n".join(revealed_lines + [" ".join(words[:end])])
+            time.sleep(delay)
+        revealed_lines.append(line)
+        yield "\n".join(revealed_lines)
+        time.sleep(delay)
+
+
+def stream_quick_message(text, source, escape_html=True):
+    """Stream an already-known reply (static FAQ answer, guard message, etc.)
+    with the same gradual reveal as a generated answer, instead of dumping it
+    in one instant chunk."""
+    yield build_meta_event(source=source)
+    for partial_text in reveal_text_progressively(text):
+        yield format_response(partial_text, escape_html=escape_html)
+    yield "[END]"
+
+
 def deployed_fallback_message():
     return (
         "I can answer common enrollment questions, but the AI response service is not configured yet. "
@@ -424,7 +471,8 @@ def stream_groq_response(prompt, history):
             groq_key_present=bool(GROQ_API_KEY),
             groq_model=GROQ_MODEL,
         )
-        yield format_response(deployed_fallback_message())
+        for partial_text in reveal_text_progressively(deployed_fallback_message()):
+            yield format_response(partial_text)
         yield "[END]"
         return
 
@@ -487,7 +535,8 @@ def stream_groq_response(prompt, history):
             groq_model=GROQ_MODEL,
             error=str(exc)[:300],
         )
-        yield format_response(temporary_service_message())
+        for partial_text in reveal_text_progressively(temporary_service_message()):
+            yield format_response(partial_text)
     yield "[END]"
 
 
@@ -500,7 +549,8 @@ def generate_response_stream(prompt, history):
 
     model, tokenizer = get_generation_model()
     if not model or not tokenizer:
-        yield format_response(deployed_fallback_message())
+        for partial_text in reveal_text_progressively(deployed_fallback_message()):
+            yield format_response(partial_text)
         yield "[END]"
         return
 
@@ -551,6 +601,16 @@ def serve_qa_json():
     return send_from_directory(str(DATA_DIR), "static_qa.json")
 
 
+def emit_sse_frames(stream):
+    for chunk in stream:
+        if chunk == "[END]":
+            yield "data: [END]\n\n"
+        elif chunk.startswith("event: meta\n"):
+            yield chunk
+        else:
+            yield f"data: {chunk}\n\n"
+
+
 @app.route("/chat-stream")
 def chat_stream():
     user_input = request.args.get("message", "").strip()
@@ -561,45 +621,37 @@ def chat_stream():
     def generate():
         try:
             if contains_multiple_questions(user_input):
-                formatted_response = format_response("Please ask one question at a time.")
-                yield f"data: {formatted_response}\n\n"
-                yield "data: [END]\n\n"
+                yield from emit_sse_frames(
+                    stream_quick_message("Please ask one question at a time.", source="multi_question_guard")
+                )
                 return
 
             if user_input.lower() == "thank you":
-                thanks = format_response("No worries! Happy to help!")
-                yield f"data: {thanks}\n\n"
-                yield "data: [END]\n\n"
+                yield from emit_sse_frames(
+                    stream_quick_message("No worries! Happy to help!", source="small_talk")
+                )
                 return
 
             result = process_query(user_input)
 
             if result["status"] == "not_relevant":
-                yield build_meta_event(source="relevancy_guard")
-                formatted_response = format_response(result["message"])
-                yield f"data: {formatted_response}\n\n"
-                yield "data: [END]\n\n"
+                yield from emit_sse_frames(
+                    stream_quick_message(result["message"], source="relevancy_guard")
+                )
                 return
 
             if result["status"] == "static_answer":
-                yield build_meta_event(source="static_qa")
-                formatted_response = format_response(result["message"])
-                yield f"data: {formatted_response}\n\n"
-                yield "data: [END]\n\n"
+                yield from emit_sse_frames(
+                    stream_quick_message(result["message"], source="static_qa", escape_html=False)
+                )
                 return
 
-            for response in generate_response_stream(user_input, history):
-                if response == "[END]":
-                    yield "data: [END]\n\n"
-                elif response.startswith("event: meta\n"):
-                    yield response
-                else:
-                    yield f"data: {response}\n\n"
+            yield from emit_sse_frames(generate_response_stream(user_input, history))
         except Exception as exc:
             print(f"Error in generate(): {exc}")
-            error_msg = format_response(temporary_service_message())
-            yield f"data: {error_msg}\n\n"
-            yield "data: [END]\n\n"
+            yield from emit_sse_frames(
+                stream_quick_message(temporary_service_message(), source="fallback")
+            )
 
     response = Response(stream_with_context(generate()), mimetype="text/event-stream")
     response.headers["Cache-Control"] = "no-cache"
