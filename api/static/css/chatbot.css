@@ -392,131 +392,65 @@
 
 #static-questions {
     flex-shrink: 0;
-    min-height: 84px;
-    padding: 10px 12px 8px;
+    padding: 10px 12px;
     background: rgba(244, 248, 255, 0.96);
     border-top: 1px solid rgba(11, 45, 99, 0.08);
     border-bottom: 1px solid rgba(11, 45, 99, 0.08);
 }
 
-.suggested-prompts-shell {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px;
-    border-radius: 16px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 246, 255, 0.96) 100%);
-    border: 1px solid rgba(11, 45, 99, 0.08);
-    box-shadow: 0 10px 20px rgba(11, 45, 99, 0.06);
-}
-
-.suggested-prompts-header {
+/* Messenger-style quick replies: a horizontally scrollable strip of pill
+   chips, no pagination controls, just swipe/scroll to see the rest. */
+.suggested-prompts-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(11, 45, 99, 0.2) transparent;
+    -webkit-overflow-scrolling: touch;
 }
 
-.suggested-prompts-label {
-    color: var(--navibot-primary);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+.suggested-prompts-row::-webkit-scrollbar {
+    height: 4px;
 }
 
-.suggested-prompts-pager {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    flex-shrink: 0;
-}
-
-.suggested-prompts-dot {
-    width: 7px;
-    height: 7px;
+.suggested-prompts-row::-webkit-scrollbar-thumb {
+    background: rgba(11, 45, 99, 0.2);
     border-radius: 999px;
-    background: rgba(11, 45, 99, 0.16);
-    transition: width 0.2s ease, background-color 0.2s ease;
 }
 
-.suggested-prompts-dot.active {
-    width: 14px;
-    background: linear-gradient(135deg, #0f4ba6 0%, #0a2f67 100%);
-}
-
-.suggested-prompts-body {
-    display: grid;
-    grid-template-columns: 32px minmax(0, 1fr) 32px;
-    align-items: stretch;
-    gap: 8px;
-}
-
-.suggested-prompts-list {
-    display: grid;
-    gap: 8px;
-}
-
-.suggested-prompts-nav {
-    border: 1px solid rgba(11, 45, 99, 0.1);
-    border-radius: 12px;
+.suggested-prompt-chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--navibot-primary-soft);
     background: #ffffff;
     color: var(--navibot-primary);
-    font-size: 15px;
-    font-weight: 700;
-    box-shadow: 0 8px 14px rgba(11, 45, 99, 0.06);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-}
-
-.suggested-prompts-nav:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 14px 24px rgba(11, 45, 99, 0.12);
-}
-
-.suggested-prompts-nav:disabled {
-    cursor: default;
-    opacity: 0.45;
-    box-shadow: none;
-}
-
-.suggested-prompt-card {
-    width: 100%;
-    display: block;
-    padding: 10px 12px;
-    border: 1px solid rgba(11, 45, 99, 0.08);
-    border-radius: 14px;
-    background: #ffffff;
-    color: var(--navibot-text);
-    text-align: left;
-    box-shadow: 0 8px 14px rgba(11, 45, 99, 0.05);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.suggested-prompt-card:hover,
-.suggested-prompt-card:focus {
-    transform: translateY(-1px);
-    border-color: rgba(15, 75, 166, 0.22);
-    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
-    box-shadow: 0 12px 22px rgba(11, 45, 99, 0.08);
-    outline: none;
-}
-
-.suggested-prompt-text {
-    display: block;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 600;
-    line-height: 1.35;
-    color: #173056;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.suggested-prompt-chip:hover,
+.suggested-prompt-chip:focus {
+    background: linear-gradient(135deg, var(--navibot-primary) 0%, var(--navibot-primary-soft) 100%);
+    color: #ffffff;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(11, 45, 99, 0.2);
+    outline: none;
 }
 
 .suggested-prompts-empty {
     display: grid;
     place-items: center;
-    min-height: 88px;
-    padding: 14px;
-    border-radius: 18px;
+    min-height: 48px;
+    padding: 10px 14px;
+    border-radius: 999px;
     border: 1px dashed rgba(11, 45, 99, 0.12);
     background: rgba(11, 45, 99, 0.03);
     color: var(--navibot-text-soft);
@@ -599,18 +533,12 @@
     }
 
     #static-questions {
-        min-height: 76px;
         padding: 10px;
     }
 
-    .suggested-prompts-shell {
-        padding: 9px;
-        border-radius: 15px;
-    }
-
-    .suggested-prompts-body {
-        grid-template-columns: 30px minmax(0, 1fr) 30px;
-        gap: 8px;
+    .suggested-prompt-chip {
+        padding: 8px 14px;
+        font-size: 12px;
     }
 }
 
@@ -639,18 +567,6 @@
         width: 32px;
         height: 32px;
         flex-basis: 32px;
-    }
-
-    .suggested-prompts-body {
-        grid-template-columns: 1fr;
-    }
-
-    .suggested-prompts-nav {
-        min-height: 34px;
-    }
-
-    .suggested-prompts-list {
-        order: -1;
     }
 
     .chat-help-tooltip {

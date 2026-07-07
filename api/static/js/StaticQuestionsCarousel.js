@@ -1,6 +1,7 @@
 // StaticQuestionsCarousel.js
+const MAX_SUGGESTED_QUESTIONS = 6;
+
 const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
-    const [activeIndex, setActiveIndex] = React.useState(0);
     const [staticQuestions, setStaticQuestions] = React.useState([]);
 
     React.useEffect(() => {
@@ -11,7 +12,10 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const qaData = await response.json();
-                setStaticQuestions(Object.keys(qaData));
+                // The FAQ dataset keeps growing as the bot is trained with more answers,
+                // but the suggested-prompts row only surfaces the first few; the
+                // rest stay answerable by typing, they're just not shown as quick-tap chips.
+                setStaticQuestions(Object.keys(qaData).slice(0, MAX_SUGGESTED_QUESTIONS));
             } catch (error) {
                 console.error('Error loading questions:', error);
                 setStaticQuestions([]);
@@ -21,132 +25,34 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
         loadQuestions();
     }, []);
 
-    const itemsPerPage = 2;
-    const totalPages = Math.max(1, Math.ceil(staticQuestions.length / itemsPerPage));
+    if (!staticQuestions.length) {
+        return React.createElement(
+            'div',
+            { className: 'suggested-prompts-empty' },
+            'Suggested questions will appear here.'
+        );
+    }
 
-    const handleNext = () => {
-        setActiveIndex((prev) => (prev + 1) % totalPages);
-    };
-
-    const handlePrev = () => {
-        setActiveIndex((prev) => (prev - 1 + totalPages) % totalPages);
-    };
-
-    const visibleQuestions = staticQuestions.slice(
-        activeIndex * itemsPerPage,
-        (activeIndex + 1) * itemsPerPage
-    );
-
-    const promptIndicatorDots = Array.from({ length: totalPages }, (_, index) =>
-        React.createElement('span', {
-            key: `prompt-dot-${index}`,
-            className: `suggested-prompts-dot${index === activeIndex ? ' active' : ''}`
-        })
-    );
-
+    // Messenger-style quick replies: a single horizontally scrollable row of
+    // pill chips, tap one to send it. No pagination arrows or page dots.
     return React.createElement(
         'div',
         {
-            className: 'suggested-prompts-shell'
+            className: 'suggested-prompts-row',
+            role: 'list',
+            'aria-label': 'Suggested prompts'
         },
-        [
+        staticQuestions.map((question, index) =>
             React.createElement(
-                'div',
+                'button',
                 {
-                    key: 'header',
-                    className: 'suggested-prompts-header'
+                    key: `${question}-${index}`,
+                    role: 'listitem',
+                    onClick: () => onQuestionSelect(question),
+                    className: 'suggested-prompt-chip'
                 },
-                [
-                    React.createElement(
-                        'div',
-                        {
-                            key: 'copy',
-                            className: 'suggested-prompts-copy'
-                        },
-                        React.createElement(
-                            'div',
-                            {
-                                key: 'label',
-                                className: 'suggested-prompts-label'
-                            },
-                            'Suggested Prompts'
-                        )
-                    ),
-                    React.createElement(
-                        'div',
-                        {
-                            key: 'pager',
-                            className: 'suggested-prompts-pager',
-                            'aria-label': 'Suggested prompt pages'
-                        },
-                        promptIndicatorDots
-                    )
-                ]
-            ),
-            React.createElement(
-                'div',
-                {
-                    key: 'body',
-                    className: 'suggested-prompts-body'
-                },
-                [
-                    React.createElement(
-                        'button',
-                        {
-                            onClick: handlePrev,
-                            key: 'prev',
-                            className: 'suggested-prompts-nav',
-                            'aria-label': 'Previous suggested questions',
-                            disabled: staticQuestions.length === 0
-                        },
-                        '\u2190'
-                    ),
-                    React.createElement(
-                        'div',
-                        {
-                            key: 'questions',
-                            className: 'suggested-prompts-list'
-                        },
-                        visibleQuestions.length
-                            ? visibleQuestions.map((question, index) =>
-                                React.createElement(
-                                    'button',
-                                    {
-                                        key: `${question}-${index}`,
-                                        onClick: () => onQuestionSelect(question),
-                                        className: 'suggested-prompt-card'
-                                    },
-                                    React.createElement(
-                                        'span',
-                                        {
-                                            key: 'text',
-                                            className: 'suggested-prompt-text'
-                                        },
-                                        question
-                                    )
-                                )
-                            )
-                            : React.createElement(
-                                'div',
-                                {
-                                    className: 'suggested-prompts-empty'
-                                },
-                                'Suggested questions will appear here.'
-                            )
-                    ),
-                    React.createElement(
-                        'button',
-                        {
-                            onClick: handleNext,
-                            key: 'next',
-                            className: 'suggested-prompts-nav',
-                            'aria-label': 'Next suggested questions',
-                            disabled: staticQuestions.length === 0
-                        },
-                        '\u2192'
-                    )
-                ]
+                question
             )
-        ]
+        )
     );
 };
