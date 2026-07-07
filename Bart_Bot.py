@@ -493,6 +493,11 @@ def stream_groq_response(prompt, history):
         headers={
             "Authorization": f"Bearer {GROQ_API_KEY}",
             "Content-Type": "application/json",
+            "Accept": "text/event-stream",
+            # urllib's default "Python-urllib/x.y" User-Agent gets blocked by the
+            # Cloudflare WAF in front of api.groq.com (403, Cloudflare error 1010)
+            # before the request ever reaches Groq's own auth check.
+            "User-Agent": "Mozilla/5.0 (compatible; NaviBot/1.0; +https://github.com/KennelyRay/Tektitans-Navibot)",
         },
     )
 
@@ -528,7 +533,22 @@ def stream_groq_response(prompt, history):
 
                 accumulated_response += delta
                 yield format_response(accumulated_response)
+    except urllib.error.HTTPError as exc:
+        try:
+            error_body = exc.read().decode("utf-8", errors="replace")[:500]
+        except Exception:
+            error_body = ""
+        print(f"Groq request failed: HTTP {exc.code} {exc.reason} - {error_body}")
+        yield build_meta_event(
+            source="fallback",
+            reason="groq_error",
+            groq_model=GROQ_MODEL,
+            error=f"HTTP {exc.code}: {error_body[:200]}",
+        )
+        for partial_text in reveal_text_progressively(temporary_service_message()):
+            yield format_response(partial_text)
     except Exception as exc:
+        print(f"Groq request failed: {exc!r}")
         yield build_meta_event(
             source="fallback",
             reason="groq_error",
