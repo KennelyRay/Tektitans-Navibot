@@ -40,6 +40,21 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
         updateScrollState();
     }, [staticQuestions, updateScrollState]);
 
+    React.useEffect(() => {
+        const row = rowRef.current;
+        // The chat widget is `display: none` until the user opens it, so the row
+        // measures 0-width (and both arrows look permanently disabled) if we only
+        // check bounds once on mount. A ResizeObserver re-checks as soon as the
+        // row actually gets laid out with real dimensions (e.g. when the chat
+        // window opens), and again on any later resize.
+        if (!row || typeof ResizeObserver === 'undefined') {
+            return undefined;
+        }
+        const observer = new ResizeObserver(() => updateScrollState());
+        observer.observe(row);
+        return () => observer.disconnect();
+    }, [staticQuestions, updateScrollState]);
+
     const scrollByStep = (direction) => {
         const row = rowRef.current;
         if (!row) return;
