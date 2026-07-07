@@ -1,8 +1,12 @@
 // StaticQuestionsCarousel.js
 const MAX_SUGGESTED_QUESTIONS = 6;
+const SCROLL_STEP_PX = 180;
 
 const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
     const [staticQuestions, setStaticQuestions] = React.useState([]);
+    const [canScrollPrev, setCanScrollPrev] = React.useState(false);
+    const [canScrollNext, setCanScrollNext] = React.useState(false);
+    const rowRef = React.useRef(null);
 
     React.useEffect(() => {
         const loadQuestions = async () => {
@@ -25,6 +29,26 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
         loadQuestions();
     }, []);
 
+    const updateScrollState = React.useCallback(() => {
+        const row = rowRef.current;
+        if (!row) return;
+        setCanScrollPrev(row.scrollLeft > 4);
+        setCanScrollNext(row.scrollLeft < row.scrollWidth - row.clientWidth - 4);
+    }, []);
+
+    React.useEffect(() => {
+        updateScrollState();
+    }, [staticQuestions, updateScrollState]);
+
+    const scrollByStep = (direction) => {
+        const row = rowRef.current;
+        if (!row) return;
+        row.scrollBy({ left: direction * SCROLL_STEP_PX, behavior: 'smooth' });
+        // The scroll animates asynchronously, so re-check the bounds shortly after
+        // instead of only relying on the (no-drag) row's own scroll event.
+        window.setTimeout(updateScrollState, 260);
+    };
+
     if (!staticQuestions.length) {
         return React.createElement(
             'div',
@@ -33,26 +57,60 @@ const StaticQuestionsCarousel = ({ onQuestionSelect }) => {
         );
     }
 
-    // Messenger-style quick replies: a single horizontally scrollable row of
-    // pill chips, tap one to send it. No pagination arrows or page dots.
+    // Messenger-style quick reply chips, but paged with explicit prev/next
+    // arrows instead of free swipe/drag scrolling.
     return React.createElement(
         'div',
-        {
-            className: 'suggested-prompts-row',
-            role: 'list',
-            'aria-label': 'Suggested prompts'
-        },
-        staticQuestions.map((question, index) =>
+        { className: 'suggested-prompts-shell' },
+        [
             React.createElement(
                 'button',
                 {
-                    key: `${question}-${index}`,
-                    role: 'listitem',
-                    onClick: () => onQuestionSelect(question),
-                    className: 'suggested-prompt-chip'
+                    key: 'prev',
+                    type: 'button',
+                    onClick: () => scrollByStep(-1),
+                    className: 'suggested-prompts-nav',
+                    'aria-label': 'Show previous suggested prompts',
+                    disabled: !canScrollPrev
                 },
-                question
+                '←'
+            ),
+            React.createElement(
+                'div',
+                {
+                    key: 'row',
+                    ref: rowRef,
+                    className: 'suggested-prompts-row',
+                    role: 'list',
+                    'aria-label': 'Suggested prompts',
+                    onScroll: updateScrollState
+                },
+                staticQuestions.map((question, index) =>
+                    React.createElement(
+                        'button',
+                        {
+                            key: `${question}-${index}`,
+                            type: 'button',
+                            role: 'listitem',
+                            onClick: () => onQuestionSelect(question),
+                            className: 'suggested-prompt-chip'
+                        },
+                        question
+                    )
+                )
+            ),
+            React.createElement(
+                'button',
+                {
+                    key: 'next',
+                    type: 'button',
+                    onClick: () => scrollByStep(1),
+                    className: 'suggested-prompts-nav',
+                    'aria-label': 'Show more suggested prompts',
+                    disabled: !canScrollNext
+                },
+                '→'
             )
-        )
+        ]
     );
 };

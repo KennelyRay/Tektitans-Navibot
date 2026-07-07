@@ -398,26 +398,55 @@
     border-bottom: 1px solid rgba(11, 45, 99, 0.08);
 }
 
-/* Messenger-style quick replies: a horizontally scrollable strip of pill
-   chips, no pagination controls, just swipe/scroll to see the rest. */
+/* Messenger-style quick reply chips, paged with explicit prev/next arrows
+   instead of free swipe/drag scrolling. */
+.suggested-prompts-shell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .suggested-prompts-row {
+    flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 8px;
-    overflow-x: auto;
-    padding: 2px 2px 6px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(11, 45, 99, 0.2) transparent;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 2px;
 }
 
-.suggested-prompts-row::-webkit-scrollbar {
-    height: 4px;
+.suggested-prompts-nav {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1.5px solid var(--navibot-primary-soft);
+    background: #ffffff;
+    color: var(--navibot-primary);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
 }
 
-.suggested-prompts-row::-webkit-scrollbar-thumb {
-    background: rgba(11, 45, 99, 0.2);
-    border-radius: 999px;
+.suggested-prompts-nav:hover:not(:disabled),
+.suggested-prompts-nav:focus:not(:disabled) {
+    background: linear-gradient(135deg, var(--navibot-primary) 0%, var(--navibot-primary-soft) 100%);
+    color: #ffffff;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(11, 45, 99, 0.18);
+    outline: none;
+}
+
+.suggested-prompts-nav:disabled {
+    cursor: default;
+    opacity: 0.35;
 }
 
 .suggested-prompt-chip {
@@ -538,6 +567,12 @@
 
     .suggested-prompt-chip {
         padding: 8px 14px;
+        font-size: 12px;
+    }
+
+    .suggested-prompts-nav {
+        width: 26px;
+        height: 26px;
         font-size: 12px;
     }
 }
