@@ -10,7 +10,6 @@ BOOT_ERROR = None
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 app = Flask(__name__)
 
-#region debug-point bootstrap-import
 try:
     if str(PROJECT_ROOT) not in sys.path:
         sys.path.insert(0, str(PROJECT_ROOT))
@@ -18,6 +17,8 @@ try:
 
     app = flask_app
 except Exception:
+    # Surface the real traceback instead of a generic Vercel crash page, since
+    # import-time failures here otherwise show up only as FUNCTION_INVOCATION_FAILED.
     BOOT_ERROR = traceback.format_exc()
 
     @app.route("/", defaults={"path": ""})
@@ -38,4 +39,3 @@ except Exception:
             ]
         )
         return Response(debug_body, status=500, mimetype="text/plain")
-#endregion

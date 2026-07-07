@@ -14,32 +14,34 @@ This repo is now configured to deploy as a Python serverless app on Vercel.
 
 ### Important runtime behavior
 
-The Vercel deployment is optimized for Vercel serverless hosting and now supports Google Gemini as the generative fallback.
+The Vercel deployment is optimized for Vercel serverless hosting and uses Groq (free tier, OpenAI-compatible API) as the generative engine.
 
-- Static Q&A from `Data/static_qa.json` works in Vercel.
-- Topic filtering still works.
-- If a static FAQ match is not found, the app can call Gemini for a generated answer.
+- Only an exact match against a known question in `Data/static_qa.json` is answered directly from the static file (fast, deterministic, always correct).
+- Every other enrollment question is answered by Groq, grounded with the *entire* static FAQ set as reference context plus the real conversation history, so it can resolve follow-up questions ("what about for irregular students?") correctly instead of relying on hand-written keyword/topic rewrite rules.
+- A small keyword list (`Data/non_academic_contexts.json`) still screens out obviously unrelated topics (movies, food, other schools, etc.) before calling Groq.
 - Heavy local NLP and BART generation are still disabled by default in Vercel because the required model files and startup cost are not serverless-friendly.
+- The Groq call is a plain HTTP request (`urllib`, no extra SDK dependency) to `https://api.groq.com/openai/v1/chat/completions` with `stream: true`.
 
 ### Vercel environment variables
 
 Add these in your Vercel project settings:
 
-- `GEMINI_API_KEY` = your Google AI Studio API key
-- `GEMINI_MODEL` = `gemini-2.0-flash` (recommended default)
+- `GROQ_API_KEY` = your free API key from [console.groq.com](https://console.groq.com/keys)
+- `GROQ_MODEL` = `llama-3.3-70b-versatile` (recommended default)
 
 Optional:
 
-- `GEMINI_MAX_CONTEXT_ITEMS` = `3`
-- `GEMINI_MAX_TOKENS` = `300`
+- `GROQ_MAX_TOKENS` = `300`
 - `ENABLE_GENERATIVE_MODEL` = `true` only if you still want to try a local BART fallback outside Vercel
 - `BART_MODEL_PATH` = path to a local BART model outside Vercel
 
-If you do not add `GEMINI_API_KEY`, the deployed chatbot will still answer direct static FAQ matches, but unmatched questions will return a configuration message instead of a generated response.
+If you do not add `GROQ_API_KEY`, the deployed chatbot will still answer direct static FAQ matches, but unmatched questions will return a configuration message instead of a generated response.
+
+Groq's free tier requires no credit card and no spend — it's rate-limited per minute/day rather than metered by cost.
 
 If you want a different generative setup in production, use one of these approaches:
 
-1. Connect the app to an external AI API.
+1. Connect the app to a different external AI API.
 2. Host the full ML stack on a VM/container platform instead of Vercel.
 3. Provide a compact local model and enable it outside Vercel with:
    - `ENABLE_GENERATIVE_MODEL=true`
@@ -51,7 +53,7 @@ If you want a different generative setup in production, use one of these approac
 2. Import the repo into Vercel.
 3. Leave the project root as the repository root.
 4. Vercel should detect the Python setup automatically using `vercel.json`.
-5. Add the required `GEMINI_API_KEY` environment variable in Vercel.
+5. Add the required `GROQ_API_KEY` environment variable in Vercel.
 6. Deploy.
 
 After deploy, test:

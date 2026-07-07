@@ -2,3 +2,5 @@
 /misc/
 /utilities/
 output/fine-tuned-bart/model.safetensors
+__pycache__/
+*.pyc
