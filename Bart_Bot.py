@@ -345,6 +345,11 @@ def resolve_follow_up_query(query, history):
         _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up resolved from enrollment venue topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic, "resolved_query": "Where do irregular students enroll?"})
         # #endregion
         return "Where do irregular students enroll?"
+    if current_topic and previous_topic and current_topic != previous_topic:
+        # #region debug-point A:followup-cross-topic-no-rewrite
+        _debug_report("A", "Bart_Bot.py:resolve_follow_up_query", "[DEBUG] Follow-up rewrite skipped because the current topic differs from the previous topic", {"query": query[:120], "current_topic": current_topic, "previous_topic": previous_topic})
+        # #endregion
+        return query
 
     if not previous_topic or not is_follow_up_query(query):
         # #region debug-point A:followup-no-rewrite
