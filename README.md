@@ -18,13 +18,13 @@ npm run build
 
 This writes `static/js/navibot.bundle.js` and copies it to `api/static/js/navibot.bundle.js` automatically. **Vercel's deploy here is Python-only** (see below) — there is no Node build step in `vercel.json`, so the bundle is a committed build artifact, not something generated at deploy time. Always run `npm run build` and commit the regenerated bundle before deploying frontend changes. `npm run watch` rebuilds on save for local iteration.
 
-### Why `vercel.json` explicitly disables install/build
+### A note on `node_modules` and Vercel
 
-Adding a root-level `package.json` makes Vercel's zero-config detection *want* to run `npm install` (and possibly `npm run build`) automatically during deploy. That's a real problem for this project: the Python function is configured with `includeFiles: "**/*"`, which bundles everything in the working directory at build time — if `npm install` ran first, the freshly created `node_modules/` (react, react-dom, esbuild's native binary, etc.) would get scooped into the Python serverless function bundle and could blow past Vercel's function size limit and crash the deploy, the same class of problem documented in past debug sessions.
+Adding a root-level `package.json` makes Vercel's zero-config detection *want* to run `npm install` during deploy, which would create `node_modules/` (react, react-dom, esbuild's native binary, etc.) in the build container. Since the Python function is configured with `includeFiles: "**/*"`, that could in theory get scooped into the serverless function bundle and blow past Vercel's size limit.
 
-To prevent that, `vercel.json` sets `installCommand` and `buildCommand` to harmless no-op `echo` commands, so Vercel never runs `npm install` at all — nothing needs building at deploy time since the bundle is already committed. `node_modules/`, `frontend/`, `package.json`, `package-lock.json`, and `build.mjs` are also excluded via `.vercelignore` as a second layer of protection.
+We deliberately do **not** fight this by overriding `installCommand`/`buildCommand` in `vercel.json` — an earlier attempt at that caused the Python function to crash outright (`FUNCTION_INVOCATION_FAILED`), most likely because it also interfered with Vercel's own `requirements.txt` install step for the Python runtime, which happens before `from flask import Flask` at the top of `api/index.py` can even succeed. Overriding root-level build commands for a Python-runtime function is risky and not worth it here.
 
-If your Vercel project's dashboard (Project Settings → Build & Development Settings) has an **Install Command** or **Build Command** override toggled on, that dashboard setting takes precedence over `vercel.json` — check that both are switched off (or left on their defaults) so the `vercel.json` values actually apply.
+Instead, `node_modules/`, `frontend/`, `package.json`, `package-lock.json`, and `build.mjs` are excluded via `.vercelignore`, which is the safer, narrower fix — it keeps those paths out of the deployment without touching how the Python function itself gets built. If you ever see function bloat or crashes again after touching `vercel.json`, check that no `installCommand`/`buildCommand` override crept back in.
 
 ## Deploying on Vercel
 
