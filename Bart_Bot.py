@@ -47,8 +47,12 @@ def clean_env_value(raw):
 
 
 GROQ_API_KEY = clean_env_value(os.environ.get("GROQ_API_KEY"))
-GROQ_MODEL = clean_env_value(os.environ.get("GROQ_MODEL")) or "llama-3.3-70b-versatile"
+# Groq retired llama-3.3-70b-versatile for free/developer-tier keys in August 2026
+# (it survives only on enterprise committed-spend contracts), and named the gpt-oss
+# models as the replacement. Check /health/groq if this default ever stops resolving.
+GROQ_MODEL = clean_env_value(os.environ.get("GROQ_MODEL")) or "openai/gpt-oss-120b"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models"
 BART_WEIGHT_FILES = ("pytorch_model.bin", "model.safetensors", "tf_model.h5")
 QUESTION_WORDS = {"how", "who", "what", "where", "when", "why", "which"}
 STOP_WORDS = {
@@ -304,6 +308,32 @@ def contains_multiple_questions(query):
     return question_count >= 2
 
 
+def apply_inline_markdown(text):
+    """Render the inline Markdown the model writes as HTML.
+
+    Groq's gpt-oss models answer in Markdown, so `**bold**` and `` `code` ``
+    used to reach the chat bubble as literal asterisks and backticks. This runs
+    after escaping, which is what makes emitting raw tags here safe: anything
+    the model injected is already inert text by this point.
+    """
+    text = re.sub(r"`([^`\n]+)`", r"<code>\1</code>", text)
+    text = re.sub(r"\*\*\*(?=\S)(.+?)(?<=\S)\*\*\*", r"<strong><em>\1</em></strong>", text, flags=re.DOTALL)
+    text = re.sub(r"\*\*(?=\S)(.+?)(?<=\S)\*\*", r"<strong>\1</strong>", text, flags=re.DOTALL)
+    text = re.sub(r"(?<![\w*])\*(?=\S)([^*\n]+?)(?<=\S)\*(?![\w*])", r"<em>\1</em>", text)
+    text = re.sub(r"(?<![\w_])__(?=\S)(.+?)(?<=\S)__(?![\w_])", r"<strong>\1</strong>", text, flags=re.DOTALL)
+    text = re.sub(r"(?<![\w_])_(?=\S)([^_\n]+?)(?<=\S)_(?![\w_])", r"<em>\1</em>", text)
+    # Answers stream in token by token, so the closing marker of the word being
+    # written has not arrived yet. Hiding the half-typed marker reads better
+    # than flashing a stray "**" on every bolded phrase.
+    text = re.sub(r"[*_]{1,3}\s*$", "", text)
+    # A bold run whose closing marker has not streamed in yet: open the tag now
+    # and close it at the end of what has arrived, so the phrase reads as bold
+    # while it types rather than showing raw asterisks until the run finishes.
+    if text.count("**") == 1:
+        text = text.replace("**", "<strong>", 1) + "</strong>"
+    return text
+
+
 def format_response(response_text, escape_html=True):
     """Wrap plain text into the chatbot's list/paragraph HTML.
 
@@ -321,7 +351,10 @@ def format_response(response_text, escape_html=True):
     placeholders = {}
 
     def stash(html):
-        placeholder_id = f"__HTML_{len(placeholders)}__"
+        # Deliberately not underscore-delimited: the inline Markdown pass
+        # below reads __like_this__ as bold and would rewrite the placeholder
+        # itself, destroying the link it was standing in for.
+        placeholder_id = f"%%HTML{len(placeholders)}%%"
         placeholders[placeholder_id] = html
         return placeholder_id
 
@@ -334,6 +367,25 @@ def format_response(response_text, escape_html=True):
         response_text,
         flags=re.IGNORECASE | re.DOTALL,
     )
+
+    def safe_href(raw_url):
+        """Only emit link schemes we actually intend to produce."""
+        candidate = raw_url.strip()
+        if candidate.lower().startswith(("http://", "https://", "mailto:")):
+            return escape(candidate, quote=True)
+        return None
+
+    def convert_markdown_link(match):
+        label, raw_url = match.group(1), match.group(2)
+        href = safe_href(raw_url)
+        if not href:
+            return label
+        return stash(f'<a href="{href}">{label}</a>')
+
+    # Markdown links have to resolve before the bare-URL autolinker below,
+    # which would otherwise match the URL inside the parentheses and leave the
+    # surrounding [label](...) syntax stranded around it.
+    response_text = re.sub(r"\[([^\]\n]+)\]\(([^)\s]+)\)", convert_markdown_link, response_text)
 
     def add_www(match):
         url = match.group(1)
@@ -348,6 +400,7 @@ def format_response(response_text, escape_html=True):
         pattern = r"(?<!http:)(?<!https:):(?!\d)"
         return re.sub(pattern, r":<br>", text)
 
+    response_text = apply_inline_markdown(response_text)
     response_text = insert_br_outside_url(response_text)
 
     for placeholder_id, html in placeholders.items():
@@ -356,22 +409,29 @@ def format_response(response_text, escape_html=True):
     lines = response_text.splitlines()
     for line in lines:
         stripped_line = line.strip()
-        if stripped_line.startswith("1. "):
+        # Matching only "1. " meant every later item in a numbered list fell
+        # through to the paragraph branch, so a multi-step answer rendered as
+        # one list item followed by loose text at a different indent.
+        ordered_match = re.match(r"^(\d+)[.)]\s+(.*)$", stripped_line)
+        bullet_match = re.match(r"^[-*\u2022]\s+(.*)$", stripped_line)
+        heading_match = re.match(r"^#{1,6}\s+(.*)$", stripped_line)
+
+        if ordered_match:
             if not in_numbered_list:
                 if in_bullet_list:
                     formatted_text += "</ul>"
                     in_bullet_list = False
                 formatted_text += "<ol>"
                 in_numbered_list = True
-            formatted_text += f"<li>{stripped_line[3:].strip()}</li>"
-        elif stripped_line.startswith("- "):
+            formatted_text += f"<li>{ordered_match.group(2).strip()}</li>"
+        elif bullet_match:
             if in_numbered_list:
                 formatted_text += "</ol>"
                 in_numbered_list = False
             if not in_bullet_list:
                 formatted_text += "<ul>"
                 in_bullet_list = True
-            formatted_text += f"<li>{stripped_line[2:].strip()}</li>"
+            formatted_text += f"<li>{bullet_match.group(1).strip()}</li>"
         elif stripped_line == "":
             if in_numbered_list:
                 formatted_text += "</ol>"
@@ -387,7 +447,10 @@ def format_response(response_text, escape_html=True):
             if in_bullet_list:
                 formatted_text += "</ul>"
                 in_bullet_list = False
-            formatted_text += f"<p>{stripped_line}</p>"
+            if heading_match:
+                formatted_text += f"<p><strong>{heading_match.group(1).strip()}</strong></p>"
+            else:
+                formatted_text += f"<p>{stripped_line}</p>"
 
     if in_numbered_list:
         formatted_text += "</ol>"
@@ -674,6 +737,46 @@ def health():
     }
 
 
+def fetch_groq_models():
+    """Ask Groq which models this key can actually use.
+
+    Groq retires models on its own schedule, so a hardcoded list here would go
+    stale and send you chasing a name that no longer resolves. Asking the API
+    is the only answer that stays correct, and it is scoped to this key - a
+    model the account cannot access simply will not appear.
+    """
+    http_request = urllib.request.Request(
+        GROQ_MODELS_URL,
+        method="GET",
+        headers={
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "User-Agent": "Mozilla/5.0 (compatible; NaviBot/1.0; +https://github.com/KennelyRay/Tektitans-Navibot)",
+        },
+    )
+    try:
+        with urllib.request.urlopen(http_request, timeout=15) as http_response:
+            body = json.loads(http_response.read().decode("utf-8"))
+    except Exception as exc:
+        return {"error": repr(exc)[:300]}
+
+    model_ids = sorted(
+        entry.get("id", "")
+        for entry in body.get("data", [])
+        if entry.get("id")
+    )
+    # Whisper/TTS/guard models also show up here but cannot serve chat turns,
+    # so calling them out saves picking one that fails the same way.
+    chat_capable = [
+        model_id
+        for model_id in model_ids
+        if not any(
+            token in model_id.lower()
+            for token in ("whisper", "tts", "guard", "embed")
+        )
+    ]
+    return {"all": model_ids, "chat_capable": chat_capable}
+
+
 def describe_secret(value):
     """A non-sensitive fingerprint of a key, safe to return from a route."""
     if not value:
@@ -745,6 +848,12 @@ def groq_diagnostics():
         report["status"] = exc.code
         report["reason"] = reason
         report["error"] = error_body
+        if reason == "groq_model_unavailable":
+            report["available_models"] = fetch_groq_models()
+            report["hint"] = (
+                f"Groq refused the model '{GROQ_MODEL}'. Set GROQ_MODEL to one of "
+                "available_models.chat_capable below, then redeploy."
+            )
     except Exception as exc:
         report["ok"] = False
         report["reason"] = "groq_unreachable"

@@ -52,7 +52,9 @@ The Vercel deployment is optimized for Vercel serverless hosting and uses Groq (
 Add these in your Vercel project settings:
 
 - `GROQ_API_KEY` = your free API key from [console.groq.com](https://console.groq.com/keys)
-- `GROQ_MODEL` = `llama-3.3-70b-versatile` (recommended default)
+- `GROQ_MODEL` = `openai/gpt-oss-120b` (recommended default; use `openai/gpt-oss-20b` if you
+  hit free-tier rate limits). Groq retired `llama-3.3-70b-versatile` for free/developer-tier
+  keys in August 2026, so that older value now fails as `groq_model_unavailable`.
 
 Optional:
 
@@ -74,8 +76,10 @@ ever exposing the key:
 - `invalid_groq_key` - Groq returned 401/403. Check the key for a typo or an expired/revoked
   value. Surrounding quotes and stray whitespace are now stripped automatically.
 - `groq_rate_limited` - free-tier per-minute/per-day limit reached; this one really is temporary.
-- `groq_model_unavailable` - `GROQ_MODEL` names a model Groq has decommissioned. Pick a current
-  one from console.groq.com.
+- `groq_model_unavailable` - `GROQ_MODEL` names a model Groq has decommissioned or that this
+  key cannot access. In this case the response also includes `available_models.chat_capable`,
+  queried live from Groq with your key - copy one of those ids into `GROQ_MODEL` and redeploy.
+  (Groq retires models on its own schedule, so never trust a model name hardcoded in docs.)
 - `groq_unreachable` - the outbound request failed or timed out.
 
 The chat stream also emits the same reason on an SSE `meta` frame, which the widget logs to the
