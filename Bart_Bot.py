@@ -31,8 +31,23 @@ STATIC_DIR = resolve_runtime_dir("static")
 FINE_TUNED_BART_DIR = BASE_DIR / "output" / "fine-tuned-bart"
 IS_VERCEL = bool(os.environ.get("VERCEL")) or bool(os.environ.get("VERCEL_ENV"))
 ENABLE_GENERATIVE_MODEL = os.environ.get("ENABLE_GENERATIVE_MODEL", "").lower() in {"1", "true", "yes"} and not IS_VERCEL
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile").strip() or "llama-3.3-70b-versatile"
+
+
+def clean_env_value(raw):
+    """Strip whitespace and any surrounding quotes from an env var.
+
+    Pasting a value into the Vercel dashboard with its quotes still attached
+    is an easy mistake to make, and a key of `"gsk_..."` fails as a plain 401
+    with nothing in the UI to distinguish it from a genuine outage.
+    """
+    value = (raw or "").strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+        value = value[1:-1].strip()
+    return value
+
+
+GROQ_API_KEY = clean_env_value(os.environ.get("GROQ_API_KEY"))
+GROQ_MODEL = clean_env_value(os.environ.get("GROQ_MODEL")) or "llama-3.3-70b-versatile"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 BART_WEIGHT_FILES = ("pytorch_model.bin", "model.safetensors", "tf_model.h5")
 QUESTION_WORDS = {"how", "who", "what", "where", "when", "why", "which"}
@@ -434,6 +449,35 @@ def temporary_service_message():
     )
 
 
+def classify_groq_failure(status_code, error_body):
+    """Map a Groq HTTP failure onto a reason code and the message to show.
+
+    A rejected key or a decommissioned model is a permanent configuration
+    problem, not a "try again in a moment" problem - telling the student to
+    retry sends them into a loop that can never succeed, and hides the fact
+    that the deployment needs fixing.
+    """
+    body = (error_body or "").lower()
+
+    if status_code in (401, 403):
+        return "invalid_groq_key", (
+            "I can still answer common enrollment questions, but the AI response service "
+            "rejected this site's credentials. The GROQ_API_KEY setting needs to be checked."
+        )
+    if status_code == 429:
+        return "groq_rate_limited", (
+            "I can help with enrollment questions, but the AI response service has hit its "
+            "usage limit for now. Please try again shortly, or ask one of the suggested "
+            "questions below."
+        )
+    if status_code == 404 or "decommission" in body or "does not exist" in body or "model_not_found" in body:
+        return "groq_model_unavailable", (
+            "I can still answer common enrollment questions, but the configured AI model is no "
+            "longer available. The GROQ_MODEL setting needs to be updated."
+        )
+    return "groq_error", temporary_service_message()
+
+
 def build_groq_messages(prompt, history):
     """Convert stored {role: user|bot, text} turns into OpenAI-style chat messages.
 
@@ -551,13 +595,15 @@ def stream_groq_response(prompt, history):
         except Exception:
             error_body = ""
         print(f"Groq request failed: HTTP {exc.code} {exc.reason} - {error_body}")
+        reason, user_message = classify_groq_failure(exc.code, error_body)
         yield build_meta_event(
             source="fallback",
-            reason="groq_error",
+            reason=reason,
             groq_model=GROQ_MODEL,
+            status=exc.code,
             error=f"HTTP {exc.code}: {error_body[:200]}",
         )
-        for partial_text in reveal_text_progressively(temporary_service_message()):
+        for partial_text in reveal_text_progressively(user_message):
             yield format_response(partial_text)
     except Exception as exc:
         print(f"Groq request failed: {exc!r}")
@@ -626,6 +672,85 @@ def health():
         "groq_max_tokens": GROQ_MAX_TOKENS,
         "vercel": IS_VERCEL,
     }
+
+
+def describe_secret(value):
+    """A non-sensitive fingerprint of a key, safe to return from a route."""
+    if not value:
+        return {"present": False}
+    return {
+        "present": True,
+        "length": len(value),
+        "prefix": value[:4],
+        "looks_like_groq_key": value.startswith("gsk_"),
+    }
+
+
+@app.route("/health/groq")
+def groq_diagnostics():
+    """Make one real, minimal Groq call and report exactly why it failed.
+
+    /chat-stream already emits the underlying error in an SSE `meta` frame,
+    but the chat UI never reads it, so a rejected key looks identical to any
+    other outage. This route makes the real cause checkable from a browser
+    without ever exposing the key itself.
+    """
+    report = {
+        "groq_key": describe_secret(GROQ_API_KEY),
+        "groq_model": GROQ_MODEL,
+        "vercel": IS_VERCEL,
+    }
+
+    if not GROQ_API_KEY:
+        report["ok"] = False
+        report["reason"] = "missing_groq_key"
+        report["hint"] = (
+            "GROQ_API_KEY is empty in this running deployment. Add it in Vercel project "
+            "settings for the environment you are hitting (Production and Preview are "
+            "separate), then redeploy - env var changes do not apply to existing deployments."
+        )
+        return report, 200
+
+    payload = json.dumps(
+        {
+            "model": GROQ_MODEL,
+            "messages": [{"role": "user", "content": "ping"}],
+            "max_tokens": 1,
+        }
+    ).encode("utf-8")
+
+    http_request = urllib.request.Request(
+        GROQ_API_URL,
+        data=payload,
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (compatible; NaviBot/1.0; +https://github.com/KennelyRay/Tektitans-Navibot)",
+        },
+    )
+
+    try:
+        with urllib.request.urlopen(http_request, timeout=15) as http_response:
+            report["ok"] = True
+            report["status"] = http_response.status
+            report["reason"] = "groq_reachable"
+    except urllib.error.HTTPError as exc:
+        try:
+            error_body = exc.read().decode("utf-8", errors="replace")[:500]
+        except Exception:
+            error_body = ""
+        reason, _ = classify_groq_failure(exc.code, error_body)
+        report["ok"] = False
+        report["status"] = exc.code
+        report["reason"] = reason
+        report["error"] = error_body
+    except Exception as exc:
+        report["ok"] = False
+        report["reason"] = "groq_unreachable"
+        report["error"] = repr(exc)[:300]
+
+    return report, 200
 
 
 @app.route("/Data/static_qa.json")

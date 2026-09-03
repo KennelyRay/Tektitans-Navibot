@@ -62,6 +62,25 @@ Optional:
 
 If you do not add `GROQ_API_KEY`, the deployed chatbot will still answer direct static FAQ matches, but unmatched questions will return a configuration message instead of a generated response.
 
+### Diagnosing "the live response service is temporarily unavailable"
+
+That message means the Groq call itself failed. Visit `/health/groq` on the deployment to
+see exactly why - it makes one real minimal Groq request and reports the outcome without
+ever exposing the key:
+
+- `missing_groq_key` - `GROQ_API_KEY` is empty in the *running* deployment. Vercel applies
+  env var changes only to new deployments, and Production/Preview are configured separately,
+  so add the key and then redeploy.
+- `invalid_groq_key` - Groq returned 401/403. Check the key for a typo or an expired/revoked
+  value. Surrounding quotes and stray whitespace are now stripped automatically.
+- `groq_rate_limited` - free-tier per-minute/per-day limit reached; this one really is temporary.
+- `groq_model_unavailable` - `GROQ_MODEL` names a model Groq has decommissioned. Pick a current
+  one from console.groq.com.
+- `groq_unreachable` - the outbound request failed or timed out.
+
+The chat stream also emits the same reason on an SSE `meta` frame, which the widget logs to the
+browser console as `[NaviBot] falling back instead of generating:`.
+
 Groq's free tier requires no credit card and no spend — it's rate-limited per minute/day rather than metered by cost.
 
 If you want a different generative setup in production, use one of these approaches:

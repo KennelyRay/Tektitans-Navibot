@@ -95,6 +95,21 @@ export default function ChatWidget() {
 
         let accumulatedData = '';
 
+        // The backend reports why a reply was generated the way it was
+        // (groq, static_qa, or a fallback plus the underlying error) on a
+        // `meta` frame. Without this listener a rejected API key looks
+        // exactly like a healthy answer that happens to be apologetic.
+        eventSource.addEventListener('meta', (event) => {
+            try {
+                const meta = JSON.parse(event.data);
+                if (meta.source === 'fallback') {
+                    console.warn('[NaviBot] falling back instead of generating:', meta);
+                }
+            } catch (err) {
+                // A malformed meta frame must never break the reply stream.
+            }
+        });
+
         eventSource.onmessage = (event) => {
             if (event.data === '[END]') {
                 eventSource.close();
