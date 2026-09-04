@@ -4,6 +4,11 @@
  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iSLU Student Portal</title>
+
+    <!-- Browser tab icon: the SLU seal, cropped to the crest and banner so it
+         stays legible at 16px (the full mark's sword tail reduces to noise). -->
+    <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
+    <link rel="apple-touch-icon" href="../static/images/apple-touch-icon.png">
     <!-- Third-Party CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -22,8 +27,8 @@
         const isFileProtocol = window.location.protocol === "file:";
         const basePath = isFileProtocol ? "../static/" : "/static/";
 
-        // Update all <link> tags for stylesheets
-        document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+        // Update all <link> tags (stylesheets plus the favicon/touch icon)
+        document.querySelectorAll('link[href]').forEach(link => {
             const href = link.getAttribute("href");
             if (!href.startsWith("http") && !href.startsWith("https") && href.includes("static")) {
                 link.href = basePath + href.split("static/").pop();
